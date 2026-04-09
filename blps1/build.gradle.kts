@@ -25,6 +25,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("io.minio:minio:8.6.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.postgresql:postgresql")

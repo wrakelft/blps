@@ -23,5 +23,13 @@ minio:
   secret-key: minioadmin
   bucket-name: pins
 
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
 server:
   port: 8080
