@@ -26,7 +26,7 @@ public class MinioFileStorageService implements FileStorageService {
         String originalFileName = file.getOriginalFilename();
         String contentType = file.getContentType();
         String extension = extractExtension(originalFileName);
-        String imageKey = "pins/" + UUID.randomUUID() + extension;
+        String imageKey = UUID.randomUUID() + extension;
 
         try (InputStream inputStream = file.getInputStream()) {
             ensureBucketExists();
