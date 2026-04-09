@@ -37,17 +37,21 @@ public class PinService {
                 .orElseThrow(() -> new NotFoundException("User with id " + authorId + " not found"));
 
         FileUploadResponse uploadResponse = fileStorageService.uploadImage(file);
+        try {
+            Pin pin = Pin.builder()
+                    .title(title.trim())
+                    .description(description)
+                    .imageUrl(uploadResponse.getImageUrl())
+                    .imageKey(uploadResponse.getImageKey())
+                    .author(author)
+                    .build();
 
-        Pin pin = Pin.builder()
-                .title(title.trim())
-                .description(description)
-                .imageUrl(uploadResponse.getImageUrl())
-                .imageKey(uploadResponse.getImageKey())
-                .author(author)
-                .build();
-
-        Pin savedPin = pinRepository.save(pin);
-        return pinMapper.toResponse(savedPin);
+            Pin savedPin = pinRepository.save(pin);
+            return pinMapper.toResponse(savedPin);
+        } catch (Exception e) {
+            fileStorageService.deleteFile(uploadResponse.getImageKey());
+            throw e;
+        }
     }
 
     public List<PinResponse> getAllPins() {
