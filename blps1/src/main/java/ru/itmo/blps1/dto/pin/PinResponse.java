@@ -12,7 +12,8 @@ public class PinResponse {
     private Long id;
     private String title;
     private String description;
-    private String contentUrl;
+    private String imageUrl;
+    private String imageKey;
     private OffsetDateTime createdAt;
     private Long authorId;
 }

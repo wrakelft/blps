@@ -16,7 +16,8 @@ public class PinMapper {
                 .id(pin.getId())
                 .title(pin.getTitle())
                 .description(pin.getDescription())
-                .contentUrl(pin.getContentUrl())
+                .imageUrl(pin.getImageUrl())
+                .imageKey(pin.getImageKey())
                 .createdAt(pin.getCreatedAt())
                 .authorId(pin.getAuthor() != null ? pin.getAuthor().getId() : null)
                 .build();

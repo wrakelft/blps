@@ -26,8 +26,11 @@ public class Pin {
     @Column(length = 2000)
     private String description;
 
-    @Column(name = "content_url", nullable = false, length = 1000)
-    private String contentUrl;
+    @Column(name = "image_url", nullable = false, length = 1000)
+    private String imageUrl;
+
+    @Column(name = "image_key", nullable = false, length = 500)
+    private String imageKey;
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
