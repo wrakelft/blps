@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.itmo.blps1.config.properties.MinioProperties;
 import ru.itmo.blps1.dto.file.FileUploadResponse;
+import ru.itmo.blps1.exception.BadRequestException;
 
 import java.io.InputStream;
 import java.util.UUID;
@@ -51,7 +52,7 @@ public class MinioFileStorageService implements FileStorageService {
                     .build();
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to upload image to MinIO", e);
+            throw new BadRequestException("Failed to upload image");
         }
     }
 
@@ -69,7 +70,7 @@ public class MinioFileStorageService implements FileStorageService {
                             .build()
             );
         } catch (Exception e) {
-            throw new RuntimeException("Failed to delete file from MinIO", e);
+            throw new BadRequestException("Failed to delete file");
         }
     }
 
