@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.itmo.blps1.dto.pin.PinResponse;
-import ru.itmo.blps1.service.PinService;
+import ru.itmo.blps1.service.pin.PinServiceInt;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
 @Tag(name = "Pins", description = "Operations with pins")
 public class PinController {
 
-    private final PinService pinService;
+    private final PinServiceInt pinService;
 
     @PostMapping(
             value = "/with-file",

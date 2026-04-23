@@ -1,4 +1,4 @@
-package ru.itmo.blps1.service;
+package ru.itmo.blps1.service.boardpin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,35 +13,32 @@ import ru.itmo.blps1.entity.Pin;
 import ru.itmo.blps1.entity.User;
 import ru.itmo.blps1.exception.BadRequestException;
 import ru.itmo.blps1.exception.ConflictException;
-import ru.itmo.blps1.exception.NotFoundException;
 import ru.itmo.blps1.mapper.BoardPinMapper;
 import ru.itmo.blps1.mapper.PinMapper;
 import ru.itmo.blps1.repository.BoardPinRepository;
-import ru.itmo.blps1.repository.BoardRepository;
-import ru.itmo.blps1.repository.PinRepository;
-import ru.itmo.blps1.repository.UserRepository;
+import ru.itmo.blps1.service.board.BoardServiceInt;
+import ru.itmo.blps1.service.pin.PinServiceInt;
 import ru.itmo.blps1.service.storage.FileStorageService;
+import ru.itmo.blps1.service.user.UserServiceInt;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class BoardPinService {
+public class BoardPinService implements BoardPinServiceInt {
 
-    private final BoardRepository boardRepository;
-    private final PinRepository pinRepository;
     private final BoardPinRepository boardPinRepository;
-    private final UserRepository userRepository;
+    private final BoardServiceInt boardService;
+    private final PinServiceInt pinService;
+    private final UserServiceInt userService;
     private final BoardPinMapper boardPinMapper;
     private final PinMapper pinMapper;
     private final FileStorageService fileStorageService;
 
+    @Override
     public BoardPinResponse saveExistingPinToBoard(Long boardId, Long pinId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new NotFoundException("Board with id " + boardId + " not found"));
-
-        Pin pin = pinRepository.findById(pinId)
-                .orElseThrow(() -> new NotFoundException("Pin with id " + pinId + " not found"));
+        Board board = boardService.getBoardEntityById(boardId);
+        Pin pin = pinService.getPinEntityById(pinId);
 
         if (boardPinRepository.existsByBoardIdAndPinId(boardId, pinId)) {
             throw new ConflictException("Pin is already saved to this board");
@@ -56,10 +53,9 @@ public class BoardPinService {
         return boardPinMapper.toResponse(savedBoardPin);
     }
 
+    @Override
     public List<PinResponse> getPinsByBoardId(Long boardId) {
-        if (!boardRepository.existsById(boardId)) {
-            throw new NotFoundException("Board with id " + boardId + " not found");
-        }
+        boardService.getBoardEntityById(boardId);
 
         return boardPinRepository.findAllByBoardId(boardId)
                 .stream()
@@ -68,6 +64,7 @@ public class BoardPinService {
                 .toList();
     }
 
+    @Override
     public CreatePinInBoardResponse createPinInBoard(
             Long boardId,
             String title,
@@ -77,24 +74,12 @@ public class BoardPinService {
     ) {
         validateCreatePinRequest(title, authorId);
 
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new NotFoundException("Board with id " + boardId + " not found"));
-
-        User author = userRepository.findById(authorId)
-                .orElseThrow(() -> new NotFoundException("User with id " + authorId + " not found"));
-
+        Board board = boardService.getBoardEntityById(boardId);
+        User author = userService.getUserEntityById(authorId);
         FileUploadResponse uploadResponse = fileStorageService.uploadImage(file);
 
         try {
-            Pin pin = Pin.builder()
-                    .title(title.trim())
-                    .description(description)
-                    .imageUrl(uploadResponse.getImageUrl())
-                    .imageKey(uploadResponse.getImageKey())
-                    .author(author)
-                    .build();
-
-            Pin savedPin = pinRepository.save(pin);
+            Pin savedPin = pinService.createPinEntity(title, description, author, uploadResponse);
 
             BoardPin boardPin = BoardPin.builder()
                     .board(board)

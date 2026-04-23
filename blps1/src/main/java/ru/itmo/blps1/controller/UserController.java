@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.itmo.blps1.dto.user.CreateUserRequest;
 import ru.itmo.blps1.dto.user.UserResponse;
-import ru.itmo.blps1.service.UserService;
+import ru.itmo.blps1.service.user.UserServiceInt;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
 @Tag(name = "Users", description = "Operations with users")
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceInt userService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

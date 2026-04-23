@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.itmo.blps1.dto.boardpin.BoardPinResponse;
 import ru.itmo.blps1.dto.boardpin.CreatePinInBoardResponse;
 import ru.itmo.blps1.dto.pin.PinResponse;
-import ru.itmo.blps1.service.BoardPinService;
+import ru.itmo.blps1.service.boardpin.BoardPinServiceInt;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ import java.util.List;
 @Tag(name = "Board-Pin", description = "Operations for saving pins to boards")
 public class BoardPinController {
 
-    private final BoardPinService boardPinService;
+    private final BoardPinServiceInt boardPinService;
 
     @PostMapping("/{boardId}/pins/{pinId}")
     @ResponseStatus(HttpStatus.CREATED)

@@ -1,4 +1,4 @@
-package ru.itmo.blps1.service;
+package ru.itmo.blps1.service.board;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,21 +10,21 @@ import ru.itmo.blps1.exception.ConflictException;
 import ru.itmo.blps1.exception.NotFoundException;
 import ru.itmo.blps1.mapper.BoardMapper;
 import ru.itmo.blps1.repository.BoardRepository;
-import ru.itmo.blps1.repository.UserRepository;
+import ru.itmo.blps1.service.user.UserServiceInt;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class BoardService {
+public class BoardService implements BoardServiceInt {
 
     private final BoardRepository boardRepository;
-    private final UserRepository userRepository;
+    private final UserServiceInt userService;
     private final BoardMapper boardMapper;
 
+    @Override
     public BoardResponse createBoard(CreateBoardRequest request) {
-        User owner = userRepository.findById(request.getOwnerId())
-                .orElseThrow(() -> new NotFoundException("User with id " + request.getOwnerId() + " not found"));
+        User owner = userService.getUserEntityById(request.getOwnerId());
 
         if (boardRepository.existsByOwnerIdAndName(request.getOwnerId(), request.getName())) {
             throw new ConflictException("Board with this name already exists for the user");
@@ -41,6 +41,7 @@ public class BoardService {
         return boardMapper.toResponse(savedBoard);
     }
 
+    @Override
     public List<BoardResponse> getAllBoards() {
         return boardRepository.findAll()
                 .stream()
@@ -48,6 +49,7 @@ public class BoardService {
                 .toList();
     }
 
+    @Override
     public BoardResponse getBoardById(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Board with id " + id + " not found"));
@@ -55,14 +57,19 @@ public class BoardService {
         return boardMapper.toResponse(board);
     }
 
+    @Override
     public List<BoardResponse> getBoardsByUserId(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("User with id " + userId + " not found");
-        }
+        userService.getUserEntityById(userId);
 
         return boardRepository.findAllByOwnerId(userId)
                 .stream()
                 .map(boardMapper::toResponse)
                 .toList();
+    }
+
+    @Override
+    public Board getBoardEntityById(Long id) {
+        return boardRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Board with id " + id + " not found"));
     }
 }

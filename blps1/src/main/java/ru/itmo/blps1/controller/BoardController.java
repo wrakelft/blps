@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.itmo.blps1.dto.board.BoardResponse;
 import ru.itmo.blps1.dto.board.CreateBoardRequest;
-import ru.itmo.blps1.service.BoardService;
+import ru.itmo.blps1.service.board.BoardServiceInt;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
 @Tag(name = "Boards", description = "Operations with boards")
 public class BoardController {
 
-    private final BoardService boardService;
+    private final BoardServiceInt boardService;
 
     @PostMapping("/api/boards")
     @ResponseStatus(HttpStatus.CREATED)

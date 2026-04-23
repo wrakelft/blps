@@ -1,4 +1,4 @@
-package ru.itmo.blps1.service;
+package ru.itmo.blps1.service.pin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,20 +11,21 @@ import ru.itmo.blps1.exception.BadRequestException;
 import ru.itmo.blps1.exception.NotFoundException;
 import ru.itmo.blps1.mapper.PinMapper;
 import ru.itmo.blps1.repository.PinRepository;
-import ru.itmo.blps1.repository.UserRepository;
 import ru.itmo.blps1.service.storage.FileStorageService;
+import ru.itmo.blps1.service.user.UserServiceInt;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PinService {
+public class PinService implements PinServiceInt {
 
     private final PinRepository pinRepository;
-    private final UserRepository userRepository;
+    private final UserServiceInt userService;
     private final PinMapper pinMapper;
     private final FileStorageService fileStorageService;
 
+    @Override
     public PinResponse createPinWithFile(
             String title,
             String description,
@@ -33,9 +34,7 @@ public class PinService {
     ) {
         validateCreatePinRequest(title, authorId);
 
-        User author = userRepository.findById(authorId)
-                .orElseThrow(() -> new NotFoundException("User with id " + authorId + " not found"));
-
+        User author = userService.getUserEntityById(authorId);
         FileUploadResponse uploadResponse = fileStorageService.uploadImage(file);
         try {
             Pin pin = Pin.builder()
@@ -54,6 +53,7 @@ public class PinService {
         }
     }
 
+    @Override
     public List<PinResponse> getAllPins() {
         return pinRepository.findAll()
                 .stream()
@@ -61,11 +61,28 @@ public class PinService {
                 .toList();
     }
 
+    @Override
     public PinResponse getPinById(Long id) {
-        Pin pin = pinRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Pin with id " + id + " not found"));
+        return pinMapper.toResponse(getPinEntityById(id));
+    }
 
-        return pinMapper.toResponse(pin);
+    @Override
+    public Pin getPinEntityById(Long id) {
+        return pinRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Pin with id " + id + " not found"));
+    }
+
+    @Override
+    public Pin createPinEntity(String title, String description, User author, FileUploadResponse uploadResponse) {
+        Pin pin = Pin.builder()
+                .title(title.trim())
+                .description(description)
+                .imageUrl(uploadResponse.getImageUrl())
+                .imageKey(uploadResponse.getImageKey())
+                .author(author)
+                .build();
+
+        return pinRepository.save(pin);
     }
 
     private void validateCreatePinRequest(String title, Long authorId) {

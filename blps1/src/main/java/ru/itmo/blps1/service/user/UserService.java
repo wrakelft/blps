@@ -1,4 +1,4 @@
-package ru.itmo.blps1.service;
+package ru.itmo.blps1.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,15 +11,15 @@ import ru.itmo.blps1.mapper.UserMapper;
 import ru.itmo.blps1.repository.UserRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserServiceInt {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
+    @Override
     public UserResponse createUser(CreateUserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new ConflictException("Username already exists");
@@ -38,6 +38,7 @@ public class UserService {
         return userMapper.toResponse(savedUser);
     }
 
+    @Override
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -45,10 +46,17 @@ public class UserService {
                 .toList();
     }
 
+    @Override
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
 
         return userMapper.toResponse(user);
+    }
+
+    @Override
+    public User getUserEntityById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
     }
 }
