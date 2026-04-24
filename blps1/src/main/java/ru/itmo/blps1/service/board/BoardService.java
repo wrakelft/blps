@@ -2,6 +2,7 @@ package ru.itmo.blps1.service.board;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.blps1.dto.board.BoardResponse;
 import ru.itmo.blps1.dto.board.CreateBoardRequest;
 import ru.itmo.blps1.entity.Board;
@@ -23,6 +24,7 @@ public class BoardService implements BoardServiceInt {
     private final BoardMapper boardMapper;
 
     @Override
+    @Transactional
     public BoardResponse createBoard(CreateBoardRequest request) {
         User owner = userService.getUserEntityById(request.getOwnerId());
 
@@ -42,6 +44,7 @@ public class BoardService implements BoardServiceInt {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BoardResponse> getAllBoards() {
         return boardRepository.findAll()
                 .stream()
@@ -50,6 +53,7 @@ public class BoardService implements BoardServiceInt {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BoardResponse getBoardById(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Board with id " + id + " not found"));
@@ -58,6 +62,7 @@ public class BoardService implements BoardServiceInt {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BoardResponse> getBoardsByUserId(Long userId) {
         userService.getUserEntityById(userId);
 
@@ -68,6 +73,7 @@ public class BoardService implements BoardServiceInt {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Board getBoardEntityById(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Board with id " + id + " not found"));

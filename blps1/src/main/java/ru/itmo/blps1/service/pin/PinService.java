@@ -2,6 +2,7 @@ package ru.itmo.blps1.service.pin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.itmo.blps1.dto.file.FileUploadResponse;
 import ru.itmo.blps1.dto.pin.PinResponse;
@@ -26,6 +27,7 @@ public class PinService implements PinServiceInt {
     private final FileStorageService fileStorageService;
 
     @Override
+    @Transactional
     public PinResponse createPinWithFile(
             String title,
             String description,
@@ -54,6 +56,7 @@ public class PinService implements PinServiceInt {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PinResponse> getAllPins() {
         return pinRepository.findAll()
                 .stream()
@@ -62,17 +65,20 @@ public class PinService implements PinServiceInt {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PinResponse getPinById(Long id) {
         return pinMapper.toResponse(getPinEntityById(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Pin getPinEntityById(Long id) {
         return pinRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Pin with id " + id + " not found"));
     }
 
     @Override
+    @Transactional
     public Pin createPinEntity(String title, String description, User author, FileUploadResponse uploadResponse) {
         Pin pin = Pin.builder()
                 .title(title.trim())

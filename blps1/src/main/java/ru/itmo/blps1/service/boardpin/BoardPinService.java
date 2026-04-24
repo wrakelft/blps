@@ -2,6 +2,7 @@ package ru.itmo.blps1.service.boardpin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.itmo.blps1.dto.boardpin.BoardPinResponse;
 import ru.itmo.blps1.dto.boardpin.CreatePinInBoardResponse;
@@ -36,6 +37,7 @@ public class BoardPinService implements BoardPinServiceInt {
     private final FileStorageService fileStorageService;
 
     @Override
+    @Transactional
     public BoardPinResponse saveExistingPinToBoard(Long boardId, Long pinId) {
         Board board = boardService.getBoardEntityById(boardId);
         Pin pin = pinService.getPinEntityById(pinId);
@@ -54,6 +56,7 @@ public class BoardPinService implements BoardPinServiceInt {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PinResponse> getPinsByBoardId(Long boardId) {
         boardService.getBoardEntityById(boardId);
 
@@ -65,6 +68,7 @@ public class BoardPinService implements BoardPinServiceInt {
     }
 
     @Override
+    @Transactional
     public CreatePinInBoardResponse createPinInBoard(
             Long boardId,
             String title,
@@ -93,7 +97,7 @@ public class BoardPinService implements BoardPinServiceInt {
                     .boardPin(boardPinMapper.toResponse(savedBoardPin))
                     .build();
         } catch (Exception e) {
-            fileStorageService.deleteFile(uploadResponse.getImageUrl());
+            fileStorageService.deleteFile(uploadResponse.getImageKey());
             throw e;
         }
     }
