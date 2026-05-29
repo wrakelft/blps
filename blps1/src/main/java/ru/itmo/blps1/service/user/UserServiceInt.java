@@ -15,4 +15,6 @@ public interface UserServiceInt {
     UserResponse getUserById(Long id);
 
     User getUserEntityById(Long id);
+
+    User getUserEntityByUsername(String username);
 }

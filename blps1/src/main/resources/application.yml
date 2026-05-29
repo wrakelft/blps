@@ -33,3 +33,9 @@ springdoc:
 
 server:
   port: 8080
+
+security:
+  xml-users-path: security-users.xml
+  jwt:
+    secret: "blps-lab-2-super-secret-key-for-jwt-generation-123456"
+    expiration-minutes: 120

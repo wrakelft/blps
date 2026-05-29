@@ -12,6 +12,7 @@ import ru.itmo.blps1.exception.BadRequestException;
 import ru.itmo.blps1.exception.NotFoundException;
 import ru.itmo.blps1.mapper.PinMapper;
 import ru.itmo.blps1.repository.PinRepository;
+import ru.itmo.blps1.security.CurrentUserService;
 import ru.itmo.blps1.service.storage.FileStorageService;
 import ru.itmo.blps1.service.user.UserServiceInt;
 
@@ -23,6 +24,7 @@ public class PinService implements PinServiceInt {
 
     private final PinRepository pinRepository;
     private final UserServiceInt userService;
+    private final CurrentUserService currentUserService;
     private final PinMapper pinMapper;
     private final FileStorageService fileStorageService;
 
@@ -36,7 +38,7 @@ public class PinService implements PinServiceInt {
     ) {
         validateCreatePinRequest(title, authorId);
 
-        User author = userService.getUserEntityById(authorId);
+        User author = currentUserService.getCurrentUserEntity();
         FileUploadResponse uploadResponse = fileStorageService.uploadImage(file);
         try {
             Pin pin = Pin.builder()
@@ -98,10 +100,6 @@ public class PinService implements PinServiceInt {
 
         if (title.length() > 200) {
             throw new BadRequestException("Pin title must be at most 200 characters");
-        }
-
-        if (authorId == null) {
-            throw new BadRequestException("Author id must not be null");
         }
     }
 }

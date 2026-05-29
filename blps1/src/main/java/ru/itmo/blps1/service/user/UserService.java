@@ -64,4 +64,11 @@ public class UserService implements UserServiceInt {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserEntityByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User with username " + username + " not found"));
+    }
 }

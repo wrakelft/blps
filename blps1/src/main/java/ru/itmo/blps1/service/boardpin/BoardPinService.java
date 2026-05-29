@@ -17,6 +17,8 @@ import ru.itmo.blps1.exception.ConflictException;
 import ru.itmo.blps1.mapper.BoardPinMapper;
 import ru.itmo.blps1.mapper.PinMapper;
 import ru.itmo.blps1.repository.BoardPinRepository;
+import ru.itmo.blps1.security.AccessControlService;
+import ru.itmo.blps1.security.CurrentUserService;
 import ru.itmo.blps1.service.board.BoardServiceInt;
 import ru.itmo.blps1.service.pin.PinServiceInt;
 import ru.itmo.blps1.service.storage.FileStorageService;
@@ -32,6 +34,8 @@ public class BoardPinService implements BoardPinServiceInt {
     private final BoardServiceInt boardService;
     private final PinServiceInt pinService;
     private final UserServiceInt userService;
+    private final CurrentUserService currentUserService;
+    private final AccessControlService accessControlService;
     private final BoardPinMapper boardPinMapper;
     private final PinMapper pinMapper;
     private final FileStorageService fileStorageService;
@@ -40,6 +44,9 @@ public class BoardPinService implements BoardPinServiceInt {
     @Transactional
     public BoardPinResponse saveExistingPinToBoard(Long boardId, Long pinId) {
         Board board = boardService.getBoardEntityById(boardId);
+
+        accessControlService.checkCanManageBoard(board);
+
         Pin pin = pinService.getPinEntityById(pinId);
 
         if (boardPinRepository.existsByBoardIdAndPinId(boardId, pinId)) {
@@ -79,7 +86,8 @@ public class BoardPinService implements BoardPinServiceInt {
         validateCreatePinRequest(title, authorId);
 
         Board board = boardService.getBoardEntityById(boardId);
-        User author = userService.getUserEntityById(authorId);
+        accessControlService.checkCanManageBoard(board);
+        User author = currentUserService.getCurrentUserEntity();
         FileUploadResponse uploadResponse = fileStorageService.uploadImage(file);
 
         try {
@@ -109,10 +117,6 @@ public class BoardPinService implements BoardPinServiceInt {
 
         if (title.length() > 200) {
             throw new BadRequestException("Pin title must be at most 200 characters");
-        }
-
-        if (authorId == null) {
-            throw new BadRequestException("Author id must not be null");
         }
     }
 }
