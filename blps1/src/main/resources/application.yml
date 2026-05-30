@@ -1,9 +1,16 @@
 spring:
+  jta:
+    enabled: true
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/blps1
-    username: postgres
-    password: 1111
-    driver-class-name: org.postgresql.Driver
+    xa:
+      data-source-class-name: org.postgresql.xa.PGXADataSource
+      properties:
+        serverName: localhost
+        portNumber: 5432
+        databaseName: blps1
+        user: postgres
+        password: 1111
 
   jpa:
     hibernate:
@@ -12,10 +19,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        transaction:
+          jta:
+            platform: org.hibernate.engine.transaction.jta.platform.internal.AtomikosJtaPlatform
 
   flyway:
     enabled: true
     locations: classpath:db/migration
+    url: jdbc:postgresql://localhost:5432/blps1
+    user: postgres
+    password: 1111
 
 minio:
   url: http://localhost:9000
@@ -39,3 +52,8 @@ security:
   jwt:
     secret: "blps-lab-2-super-secret-key-for-jwt-generation-123456"
     expiration-minutes: 120
+
+logging:
+  level:
+    com.atomikos: INFO
+    org.springframework.transaction: DEBUG

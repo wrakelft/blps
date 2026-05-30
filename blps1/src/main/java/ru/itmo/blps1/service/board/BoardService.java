@@ -33,7 +33,7 @@ public class BoardService implements BoardServiceInt {
     public BoardResponse createBoard(CreateBoardRequest request) {
         User owner = currentUserService.getCurrentUserEntity();
 
-        if (boardRepository.existsByOwnerIdAndName(request.getOwnerId(), request.getName())) {
+        if (boardRepository.existsByOwnerIdAndName(owner.getId(), request.getName())) {
             throw new ConflictException("Board with this name already exists for the user");
         }
 
@@ -53,6 +53,7 @@ public class BoardService implements BoardServiceInt {
     public List<BoardResponse> getAllBoards() {
         return boardRepository.findAll()
                 .stream()
+                .filter(accessControlService::canViewBoard)
                 .map(boardMapper::toResponse)
                 .toList();
     }
@@ -60,8 +61,9 @@ public class BoardService implements BoardServiceInt {
     @Override
     @Transactional(readOnly = true)
     public BoardResponse getBoardById(Long id) {
-        Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Board with id " + id + " not found"));
+        Board board = getBoardEntityById(id);
+
+        accessControlService.checkCanViewBoard(board);
 
         return boardMapper.toResponse(board);
     }
@@ -69,10 +71,9 @@ public class BoardService implements BoardServiceInt {
     @Override
     @Transactional(readOnly = true)
     public List<BoardResponse> getBoardsByUserId(Long userId) {
-        userService.getUserEntityById(userId);
-
         return boardRepository.findAllByOwnerId(userId)
                 .stream()
+                .filter(accessControlService::canViewBoard)
                 .map(boardMapper::toResponse)
                 .toList();
     }

@@ -65,7 +65,9 @@ public class BoardPinService implements BoardPinServiceInt {
     @Override
     @Transactional(readOnly = true)
     public List<PinResponse> getPinsByBoardId(Long boardId) {
-        boardService.getBoardEntityById(boardId);
+        Board board = boardService.getBoardEntityById(boardId);
+
+        accessControlService.checkCanViewBoard(board);
 
         return boardPinRepository.findAllByBoardId(boardId)
                 .stream()
