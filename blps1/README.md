@@ -1,131 +1,420 @@
 # BLPS Pinterest API
 
-REST API-приложение на Spring Boot для моделирования бизнес-процесса публикации новых записей и формирования досок в стиле Pinterest.
+REST API на Spring Boot для моделирования бизнес-процесса публикации пинов и формирования досок в стиле Pinterest.
 
-## Что реализовано
+## Возможности
 
-Приложение позволяет:
+- создание бизнес-пользователей;
+- создание досок;
+- изменение приватности доски: `PUBLIC` / `PRIVATE`;
+- загрузка изображений в MinIO;
+- создание пинов с изображением;
+- сохранение существующего пина в доску;
+- создание нового пина и одновременное сохранение его в доску;
+- получение пользователей, досок, пинов и пинов конкретной доски;
+- удаление доски вместе со связями с пинами;
+- аутентификация через JAAS + XML;
+- авторизация через JWT;
+- разграничение доступа по ролям `USER` и `ADMIN`;
+- управление транзакциями через Spring JTA + Atomikos.
 
-- создавать пользователей
-- создавать доски
-- загружать изображения в MinIO
-- создавать пины только с изображением
-- сохранять существующий пин в доску
-- создавать новый пин с файлом и сразу сохранять его в доску
-- получать списки пользователей, досок и пинов
-- получать пины конкретной доски
-
-## Технологии
+## Стек
 
 - Java 17
-- Spring Boot
-- Spring Web
+- Spring Boot 4
+- Spring Web MVC
 - Spring Data JPA
+- Spring Security
+- JAAS
+- JWT
 - PostgreSQL
 - Flyway
 - MinIO
-- Gradle
+- Atomikos / JTA
 - Swagger / OpenAPI
-- Insomnia
+- Gradle Kotlin DSL
+- Docker Compose
+- Lombok
 
----
+## Архитектура
 
-# Структура проекта
+```text
+Controller
+    ↓
+Service
+    ↓
+Repository
+    ↓
+PostgreSQL
+```
 
-- `src/main/java/.../entity` — сущности БД
-- `src/main/java/.../repository` — JPA-репозитории
-- `src/main/java/.../dto` — DTO для API
-- `src/main/java/.../mapper` — мапперы
-- `src/main/java/.../service` — бизнес-логика
-- `src/main/java/.../controller` — REST-контроллеры
-- `src/main/java/.../exception` — обработка ошибок
-- `src/main/resources/db/migration` — миграции Flyway
-- `src/main/resources/application.yml` — конфигурация приложения
+Файлы хранятся отдельно:
 
----
+```text
+Controller
+    ↓
+FileStorageService
+    ↓
+MinIO
+```
 
-# Функциональность API
+В PostgreSQL сохраняются только метаданные изображения:
 
-## Users
-- `POST /api/users` — создать пользователя
-- `GET /api/users` — получить всех пользователей
-- `GET /api/users/{id}` — получить пользователя по id
+- `imageKey`;
+- `imageUrl`.
 
-## Boards
-- `POST /api/boards` — создать доску
-- `GET /api/boards` — получить все доски
-- `GET /api/boards/{id}` — получить доску по id
-- `GET /api/users/{userId}/boards` — получить доски пользователя
+Сам файл хранится в MinIO.
 
-## Files
-- `POST /api/files/upload` — загрузить изображение в MinIO
+## Структура проекта
 
-## Pins
-- `POST /api/pins/with-file` — создать пин с изображением
-- `GET /api/pins` — получить все пины
-- `GET /api/pins/{id}` — получить пин по id
+```text
+src/main/java/.../controller   REST-контроллеры
+src/main/java/.../service      бизнес-логика
+src/main/java/.../repository   JPA-репозитории
+src/main/java/.../entity       сущности БД
+src/main/java/.../dto          DTO для API
+src/main/java/.../mapper       мапперы
+src/main/java/.../exception    обработка ошибок
+src/main/java/.../security     Spring Security, JWT, JAAS
+src/main/resources/db/migration Flyway-миграции
+src/main/resources/security-users.xml security-пользователи
+```
 
-## Board-Pin workflow
-- `POST /api/boards/{boardId}/pins/{pinId}` — сохранить существующий пин в доску
-- `GET /api/boards/{boardId}/pins` — получить все пины доски
-- `POST /api/boards/{boardId}/pins/with-file` — создать новый пин с файлом и сразу сохранить в доску
+## Основные сущности
 
----
+### User
 
-# Локальный запуск
+Бизнес-пользователь приложения.
 
-## 1. Требования
+Поля:
 
-Перед запуском должны быть установлены:
+- `id`
+- `username`
+- `email`
+
+### Board
+
+Доска пользователя.
+
+Поля:
+
+- `id`
+- `name`
+- `description`
+- `privacy`
+- `owner`
+- `createdAt`
+
+Значения `privacy`:
+
+```text
+PUBLIC
+PRIVATE
+```
+
+### Pin
+
+Пин с изображением.
+
+Поля:
+
+- `id`
+- `title`
+- `description`
+- `imageKey`
+- `imageUrl`
+- `author`
+
+### BoardPin
+
+Связь между доской и пином.
+
+```text
+Board ↔ Pin
+```
+
+При удалении доски удаляются связи `BoardPin`, но сами `Pin` не удаляются.
+
+## API
+
+### Auth
+
+```http
+POST /api/auth/login
+```
+
+Пример запроса:
+
+```json
+{
+  "username": "gleb",
+  "password": "1234"
+}
+```
+
+Пример ответа:
+
+```json
+{
+  "token": "...",
+  "username": "gleb",
+  "roles": ["USER"]
+}
+```
+
+Для защищённых запросов:
+
+```http
+Authorization: Bearer <token>
+```
+
+### Users
+
+```http
+POST /api/users
+GET /api/users
+GET /api/users/{id}
+```
+
+`POST /api/users` создаёт бизнес-пользователя в PostgreSQL. Это не security-регистрация.
+
+### Boards
+
+```http
+POST /api/boards
+GET /api/boards
+GET /api/boards/{id}
+GET /api/users/{userId}/boards
+PATCH /api/boards/{id}/privacy
+DELETE /api/boards/{id}
+```
+
+Изменение приватности:
+
+```json
+{
+  "privacy": "PRIVATE"
+}
+```
+
+### Files
+
+```http
+POST /api/files/upload
+```
+
+### Pins
+
+```http
+POST /api/pins/with-file
+GET /api/pins
+GET /api/pins/{id}
+```
+
+### Board-Pin workflow
+
+```http
+POST /api/boards/{boardId}/pins/{pinId}
+GET /api/boards/{boardId}/pins
+POST /api/boards/{boardId}/pins/with-file
+```
+
+## Безопасность
+
+Security-пользователи хранятся в:
+
+```text
+src/main/resources/security-users.xml
+```
+
+Пример:
+
+```xml
+<users>
+    <user>
+        <username>gleb</username>
+        <password>1234</password>
+        <roles>
+            <role>USER</role>
+        </roles>
+    </user>
+
+    <user>
+        <username>admin</username>
+        <password>admin</password>
+        <roles>
+            <role>ADMIN</role>
+        </roles>
+    </user>
+</users>
+```
+
+Роли:
+
+- `ANONYMOUS` — пользователь без JWT;
+- `USER` — обычный авторизованный пользователь;
+- `ADMIN` — администратор.
+
+Права:
+
+| Действие | ANONYMOUS | USER | ADMIN |
+|---|---:|---:|---:|
+| Логин | Да | Да | Да |
+| Просмотр PUBLIC-досок | Да | Да | Да |
+| Просмотр своей PRIVATE-доски | Нет | Да | Да |
+| Просмотр чужой PRIVATE-доски | Нет | Нет | Да |
+| Создание доски | Нет | Да | Да |
+| Создание пина | Нет | Да | Да |
+| Изменение приватности доски | Нет | Только своей | Да |
+| Удаление доски | Нет | Только своей | Да |
+| Добавление пина в доску | Нет | Только в свою | Да |
+
+## JWT и JAAS
+
+Логин выполняется через JAAS:
+
+```text
+AuthController
+    ↓
+JaasAuthService
+    ↓
+LoginContext
+    ↓
+XmlLoginModule
+    ↓
+security-users.xml
+```
+
+После успешного логина сервер выдаёт JWT.
+
+Дальше `JwtAuthFilter` проверяет токен в заголовке `Authorization` и кладёт пользователя в `SecurityContext`.
+
+## Транзакции
+
+В сервисном слое используются декларативные транзакции:
+
+```java
+@Transactional
+```
+
+Для чтения:
+
+```java
+@Transactional(readOnly = true)
+```
+
+В качестве JTA transaction manager используется Atomikos.
+
+PostgreSQL подключён как XA datasource:
+
+```yaml
+spring:
+  datasource:
+    xa:
+      data-source-class-name: org.postgresql.xa.PGXADataSource
+```
+
+Flyway использует отдельное обычное JDBC-подключение.
+
+## Локальный запуск
+
+### Требования
 
 - Java 17
-- Gradle или Gradle Wrapper
-- PostgreSQL
 - Docker Desktop
-- Insomnia (для тестирования API)
+- PostgreSQL
+- Gradle Wrapper
 
----
+### PostgreSQL
 
-## 2. Настройка PostgreSQL
+Создать базу данных, например:
 
-PostgreSQL используется локально.
+```text
+blps1
+```
 
-Нужно создать базу данных, например:
+Настройки подключения находятся в:
 
-- `blps1`
+```text
+src/main/resources/application.yml
+```
 
-Также нужно знать:
-- имя пользователя PostgreSQL
-- пароль PostgreSQL
-- порт PostgreSQL
+### MinIO
 
-### Где указывать данные PostgreSQL
+Запуск инфраструктуры:
 
-Файл:
-
-- `src/main/resources/application.yml`
-
----
-
-## 3. Minio запускается локально через Docker
-
-В корне проекта
 ```bash
 docker-compose up -d
 ```
 
----
+MinIO Console:
 
-## 4. Запуск серверной части
+```text
+http://localhost:9001
+```
 
-В корне проекта
+По умолчанию:
+
+```text
+login: minioadmin
+password: minioadmin
+```
+
+Bucket:
+
+```text
+pins
+```
+
+### Backend
+
+Linux/macOS:
+
 ```bash
 ./gradlew bootRun
 ```
 
----
+Windows:
 
-## 5. URL
+```powershell
+.\gradlew.bat bootRun
+```
 
-- `http://localhost:9001` - MinIO
-- `http://localhost:8080/swagger-ui/index.html` - Swagger
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+## Prod-запуск
+
+Сборка jar:
+
+```bash
+./gradlew clean bootJar
+```
+
+Запуск с prod-профилем:
+
+```bash
+java -jar build/libs/blps1-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+```
+
+Пример prod-порта:
+
+```text
+http://localhost:9177/swagger-ui.html
+```
+
+## Проверочный сценарий
+
+1. Создать бизнес-пользователей `gleb` и `admin` через `POST /api/users`.
+2. Выполнить логин `gleb` через `POST /api/auth/login`.
+3. Выполнить логин `admin` через `POST /api/auth/login`.
+4. Проверить, что `POST /api/boards` без токена возвращает `401`.
+5. Создать доску с токеном `gleb`.
+6. Изменить приватность доски на `PRIVATE`.
+7. Проверить, что без токена `GET /api/boards/{id}` возвращает `403`.
+8. Проверить, что владелец видит свою `PRIVATE`-доску.
+9. Проверить, что `ADMIN` видит любую `PRIVATE`-доску.
+10. Удалить доску и проверить, что связанные `BoardPin` удалены.
