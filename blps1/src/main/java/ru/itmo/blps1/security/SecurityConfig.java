@@ -41,6 +41,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
+                                "/api-docs",
+                                "/api-docs/**",
+                                "/v3/api-docs",
                                 "/v3/api-docs/**"
                         ).permitAll()
 
@@ -51,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/boards").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/boards/*/moderation/submit").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/boards/*/privacy").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasAnyRole("USER", "ADMIN")
 

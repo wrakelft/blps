@@ -17,6 +17,7 @@ public class BoardMapper {
                 .name(board.getName())
                 .description(board.getDescription())
                 .privacy(board.getPrivacy())
+                .moderationStatus(board.getModerationStatus())
                 .createdAt(board.getCreatedAt())
                 .ownerId(board.getOwner() != null ? board.getOwner().getId() : null)
                 .build();

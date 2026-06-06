@@ -2,6 +2,7 @@ package ru.itmo.blps1.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.itmo.blps1.entity.enums.BoardModerationStatus;
 import ru.itmo.blps1.entity.enums.BoardPrivacy;
 
 import java.time.OffsetDateTime;
@@ -31,6 +32,10 @@ public class Board {
     @Column(nullable = false, length = 20)
     private BoardPrivacy privacy;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "moderation_status", nullable = false, length = 30)
+    private BoardModerationStatus moderationStatus;
+
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
@@ -49,6 +54,9 @@ public class Board {
         }
         if (privacy == null) {
             privacy = BoardPrivacy.PUBLIC;
+        }
+        if (moderationStatus == null) {
+            moderationStatus = BoardModerationStatus.DRAFT;
         }
     }
 }
