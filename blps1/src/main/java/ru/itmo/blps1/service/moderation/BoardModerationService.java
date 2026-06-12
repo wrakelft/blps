@@ -12,6 +12,8 @@ import ru.itmo.blps1.entity.enums.ExternalSyncStatus;
 import ru.itmo.blps1.entity.enums.ModerationRequestStatus;
 import ru.itmo.blps1.exception.BadRequestException;
 import ru.itmo.blps1.exception.NotFoundException;
+import ru.itmo.blps1.integration.corporate.CorporateModerationConnector;
+import ru.itmo.blps1.integration.corporate.dto.ExternalModerationTask;
 import ru.itmo.blps1.messaging.event.BoardModerationRequestEvent;
 import ru.itmo.blps1.messaging.producer.BoardModerationProducer;
 import ru.itmo.blps1.repository.BoardModerationRequestRepository;
@@ -36,7 +38,8 @@ public class BoardModerationService implements BoardModerationServiceInt {
 
     private final OutboxEventServiceInt outboxEventService;
 
-    private final BoardModerationProducer boardModerationProducer;
+    private final CorporateModerationConnector corporateModerationConnector;
+
 
     @Override
     @Transactional
@@ -111,6 +114,21 @@ public class BoardModerationService implements BoardModerationServiceInt {
                 .build();
 
         boardModerationRequestRepository.save(request);
+
+        try {
+            ExternalModerationTask externalTask = corporateModerationConnector.createModerationTask(request);
+
+            request.setExternalSystem(externalTask.externalSystem());
+            request.setExternalTaskId(externalTask.externalTaskId());
+            request.setExternalSyncStatus(ExternalSyncStatus.SUCCESS);
+            request.setStatus(ModerationRequestStatus.SENT_TO_EXTERNAL_SYSTEM);
+        } catch (Exception exception) {
+            request.setExternalSyncStatus(ExternalSyncStatus.FAILED);
+            request.setStatus(ModerationRequestStatus.FAILED);
+            request.setComment("Failed to sync with Bitrix24: " + exception.getMessage());
+        }
+
+
         board.setModerationStatus(BoardModerationStatus.IN_REVIEW);
         boardRepository.save(board);
 

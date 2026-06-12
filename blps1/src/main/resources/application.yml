@@ -69,6 +69,10 @@ logging:
     com.atomikos: INFO
     org.springframework.transaction: DEBUG
 
+bitrix24:
+  webhook-url: ${BITRIX24_WEBHOOK_URL:}
+  responsible-id: ${BITRIX24_RESPONSIBLE_ID:1}
+
 app:
   outbox:
     publish-delay-ms: 5000
