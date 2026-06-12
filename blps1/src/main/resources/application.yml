@@ -30,6 +30,11 @@ spring:
     user: postgres
     password: 1111
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 minio:
   url: http://localhost:9000
   access-key: minioadmin
@@ -57,3 +62,8 @@ logging:
   level:
     com.atomikos: INFO
     org.springframework.transaction: DEBUG
+
+app:
+  kafka:
+    topics:
+      board-moderation-requests: board-moderation-requests
