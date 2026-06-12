@@ -3,6 +3,7 @@ package ru.itmo.blps1.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,11 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnProperty(
+        name = "app.outbox.publisher-enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class OutboxPublisherScheduler {
 
     private final OutboxEventRepository outboxEventRepository;
