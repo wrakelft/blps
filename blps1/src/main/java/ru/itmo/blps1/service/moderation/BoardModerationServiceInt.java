@@ -8,4 +8,6 @@ public interface BoardModerationServiceInt {
     SubmitBoardModerationResponse submitBoardForModeration(Long boardId);
 
     void processBoardModeration(BoardModerationRequestEvent event);
+
+    void retryFailedExternalSync();
 }

@@ -76,6 +76,8 @@ bitrix24:
 app:
   outbox:
     publish-delay-ms: 5000
+  bitrix24:
+    publish-delay-ms: 30000
   kafka:
     consumer-enabled: true
     topics:

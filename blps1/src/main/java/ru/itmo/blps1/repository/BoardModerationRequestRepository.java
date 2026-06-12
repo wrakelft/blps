@@ -15,4 +15,8 @@ public interface BoardModerationRequestRepository extends JpaRepository<BoardMod
     List<BoardModerationRequest> findAllByStatus(ModerationRequestStatus status);
 
     List<BoardModerationRequest> findAllByExternalSyncStatus(ExternalSyncStatus externalSyncStatus);
+
+    List<BoardModerationRequest> findTop20ByExternalSyncStatusOrderByCreatedAtAsc(
+            ExternalSyncStatus externalSyncStatus
+    );
 }

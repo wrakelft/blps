@@ -23,6 +23,7 @@ import ru.itmo.blps1.security.CurrentUserService;
 import ru.itmo.blps1.service.outbox.OutboxEventServiceInt;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -132,5 +133,30 @@ public class BoardModerationService implements BoardModerationServiceInt {
         board.setModerationStatus(BoardModerationStatus.IN_REVIEW);
         boardRepository.save(board);
 
+    }
+
+    @Override
+    @Transactional
+    public void retryFailedExternalSync() {
+        List<BoardModerationRequest> failedRequests = boardModerationRequestRepository
+                .findTop20ByExternalSyncStatusOrderByCreatedAtAsc(ExternalSyncStatus.FAILED);
+
+        for (BoardModerationRequest request : failedRequests) {
+            try {
+                ExternalModerationTask externalTask = corporateModerationConnector.createModerationTask(request);
+
+                request.setExternalSystem(externalTask.externalSystem());
+                request.setExternalTaskId(externalTask.externalTaskId());
+                request.setExternalSyncStatus(ExternalSyncStatus.SUCCESS);
+                request.setStatus(ModerationRequestStatus.SENT_TO_EXTERNAL_SYSTEM);
+                request.setComment(null);
+
+                if (request.getBoard() != null) {
+                    request.getBoard().setModerationStatus(BoardModerationStatus.IN_REVIEW);
+                }
+            } catch (Exception exception) {
+                request.setComment("Retry failed to sync with Bitrix24: " + exception.getMessage());
+            }
+        }
     }
 }
