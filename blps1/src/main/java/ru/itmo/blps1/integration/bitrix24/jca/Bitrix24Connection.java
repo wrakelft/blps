@@ -101,6 +101,53 @@ public class Bitrix24Connection implements AutoCloseable {
         return value.endsWith("/") ? value : value + "/";
     }
 
+    public void addComment(String externalTaskId, String comment) {
+        checkOpen();
+
+        if (externalTaskId == null || externalTaskId.isBlank()) {
+            return;
+        }
+
+        if (webhookUrl == null || webhookUrl.isBlank()) {
+            return;
+        }
+
+        Map<String, Object> body = Map.of(
+                "TASKID", Long.valueOf(externalTaskId),
+                "FIELDS", Map.of(
+                        "POST_MESSAGE", comment
+                )
+        );
+
+        restClient.post()
+                .uri(webhookUrl + "task.commentitem.add")
+                .body(body)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void completeTask(String externalTaskId) {
+        checkOpen();
+
+        if (externalTaskId == null || externalTaskId.isBlank()) {
+            return;
+        }
+
+        if (webhookUrl == null || webhookUrl.isBlank()) {
+            return;
+        }
+
+        Map<String, Object> body = Map.of(
+                "taskId", Long.valueOf(externalTaskId)
+        );
+
+        restClient.post()
+                .uri(webhookUrl + "tasks.task.complete")
+                .body(body)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
     @Override
     public void close() {
         this.closed = true;

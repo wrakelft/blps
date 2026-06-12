@@ -20,4 +20,19 @@ public class Bitrix24CorporateModerationConnector implements CorporateModeration
             return connection.createTask(request);
         }
     }
+
+    @Override
+    public void addDecisionComment(String externalTaskId, String comment) {
+        try (Bitrix24Connection connection = connectionFactory.getConnection()) {
+            connection.addComment(externalTaskId, comment);
+        }
+    }
+
+    @Override
+    public void completeTask(String externalTaskId) {
+        try (Bitrix24Connection connection = connectionFactory.getConnection()) {
+            connection.completeTask(externalTaskId);
+        }
+
+    }
 }

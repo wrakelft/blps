@@ -12,7 +12,10 @@ import ru.itmo.blps1.exception.BadRequestException;
 import ru.itmo.blps1.exception.NotFoundException;
 import ru.itmo.blps1.mapper.PinMapper;
 import ru.itmo.blps1.repository.PinRepository;
+import ru.itmo.blps1.security.AccessControlService;
 import ru.itmo.blps1.security.CurrentUserService;
+import ru.itmo.blps1.service.boardpin.BoardPinQueryServiceInt;
+import ru.itmo.blps1.service.boardpin.BoardPinServiceInt;
 import ru.itmo.blps1.service.storage.FileStorageService;
 import ru.itmo.blps1.service.user.UserServiceInt;
 
@@ -25,8 +28,10 @@ public class PinService implements PinServiceInt {
     private final PinRepository pinRepository;
     private final UserServiceInt userService;
     private final CurrentUserService currentUserService;
+    private final BoardPinQueryServiceInt boardPinQueryService;
     private final PinMapper pinMapper;
     private final FileStorageService fileStorageService;
+    private final AccessControlService accessControlService;
 
     @Override
     @Transactional
@@ -62,6 +67,10 @@ public class PinService implements PinServiceInt {
     public List<PinResponse> getAllPins() {
         return pinRepository.findAll()
                 .stream()
+                .filter(pin -> accessControlService.canViewPin(
+                        pin,
+                        boardPinQueryService.getBoardsContainingPin(pin.getId())
+                ))
                 .map(pinMapper::toResponse)
                 .toList();
     }
@@ -69,7 +78,14 @@ public class PinService implements PinServiceInt {
     @Override
     @Transactional(readOnly = true)
     public PinResponse getPinById(Long id) {
-        return pinMapper.toResponse(getPinEntityById(id));
+        Pin pin = pinRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Pin not found with id: " + id));
+
+        accessControlService.checkCanViewPin(
+                pin,
+                boardPinQueryService.getBoardsContainingPin(pin.getId())
+        );
+        return pinMapper.toResponse(pin);
     }
 
     @Override

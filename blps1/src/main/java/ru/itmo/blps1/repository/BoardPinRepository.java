@@ -11,5 +11,5 @@ public interface BoardPinRepository extends JpaRepository<BoardPin, Long> {
 
     List<BoardPin> findAllByBoardId(Long boardId);
 
-    List<BoardPin> findAllByPinId(Long pinId);
+    List<BoardPin> findAllByPin_Id(Long pinId);
 }

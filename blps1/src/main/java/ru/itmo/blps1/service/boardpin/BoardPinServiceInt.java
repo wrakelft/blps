@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.itmo.blps1.dto.boardpin.BoardPinResponse;
 import ru.itmo.blps1.dto.boardpin.CreatePinInBoardResponse;
 import ru.itmo.blps1.dto.pin.PinResponse;
+import ru.itmo.blps1.entity.Board;
 
 import java.util.List;
 

@@ -195,6 +195,11 @@ public class BoardModerationService implements BoardModerationServiceInt {
 
         request.getBoard().setModerationStatus(BoardModerationStatus.APPROVED);
 
+        syncDecisionWithExternalSystem(
+                request,
+                "Board moderation approved. Board ID: " + request.getBoard().getId()
+        );
+
         return boardModerationRequestMapper.toResponse(request);
     }
 
@@ -221,6 +226,42 @@ public class BoardModerationService implements BoardModerationServiceInt {
 
         request.getBoard().setModerationStatus(BoardModerationStatus.REJECTED);
 
+        syncDecisionWithExternalSystem(
+                request,
+                "Board moderation rejected. Board ID: "
+                    + request.getBoard().getId()
+                    + ". Reason: "
+                    + rejectRequest.comment()
+        );
+
         return boardModerationRequestMapper.toResponse(request);
+    }
+
+    private void syncDecisionWithExternalSystem(BoardModerationRequest request, String decisionComment) {
+        String externalTaskId = request.getExternalTaskId();
+
+        if (externalTaskId == null || externalTaskId.isBlank()) {
+            return;
+        }
+
+        try {
+            corporateModerationConnector.addDecisionComment(externalTaskId, decisionComment);
+            corporateModerationConnector.completeTask(externalTaskId);
+        } catch (Exception exception) {
+            request.setComment(
+                    appendComment(
+                            request.getComment(),
+                            "Failed to update Bitrix24 task after decision: " + exception.getMessage()
+                    )
+            );
+        }
+    }
+
+    private String appendComment(String currentComment, String newComment) {
+        if (currentComment == null || currentComment.isBlank()) {
+            return newComment;
+        }
+
+        return currentComment + "\n" + newComment;
     }
 }
