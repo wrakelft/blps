@@ -58,6 +58,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/boards/*/privacy").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasAnyRole("USER", "ADMIN")
 
+                        .requestMatchers(HttpMethod.GET, "/api/moderation/requests/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/moderation/requests/*/approve").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/moderation/requests/*/reject").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/api/pins/with-file").hasAnyRole("USER", "ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/api/boards/*/pins/*").hasAnyRole("USER", "ADMIN")

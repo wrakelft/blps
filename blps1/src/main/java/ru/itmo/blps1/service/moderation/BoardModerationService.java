@@ -3,6 +3,8 @@ package ru.itmo.blps1.service.moderation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.itmo.blps1.dto.moderation.ModerationRequestResponse;
+import ru.itmo.blps1.dto.moderation.RejectModerationRequest;
 import ru.itmo.blps1.dto.moderation.SubmitBoardModerationResponse;
 import ru.itmo.blps1.entity.Board;
 import ru.itmo.blps1.entity.BoardModerationRequest;
@@ -14,8 +16,8 @@ import ru.itmo.blps1.exception.BadRequestException;
 import ru.itmo.blps1.exception.NotFoundException;
 import ru.itmo.blps1.integration.corporate.CorporateModerationConnector;
 import ru.itmo.blps1.integration.corporate.dto.ExternalModerationTask;
+import ru.itmo.blps1.mapper.BoardModerationRequestMapper;
 import ru.itmo.blps1.messaging.event.BoardModerationRequestEvent;
-import ru.itmo.blps1.messaging.producer.BoardModerationProducer;
 import ru.itmo.blps1.repository.BoardModerationRequestRepository;
 import ru.itmo.blps1.repository.BoardRepository;
 import ru.itmo.blps1.security.AccessControlService;
@@ -41,6 +43,7 @@ public class BoardModerationService implements BoardModerationServiceInt {
 
     private final CorporateModerationConnector corporateModerationConnector;
 
+    private final BoardModerationRequestMapper boardModerationRequestMapper;
 
     @Override
     @Transactional
@@ -158,5 +161,66 @@ public class BoardModerationService implements BoardModerationServiceInt {
                 request.setComment("Retry failed to sync with Bitrix24: " + exception.getMessage());
             }
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ModerationRequestResponse> getAllModerationRequests() {
+        return boardModerationRequestRepository.findAll()
+                .stream()
+                .map(boardModerationRequestMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public ModerationRequestResponse approveModerationRequest(Long requestId) {
+        BoardModerationRequest request = boardModerationRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Moderation request not found with id: " + requestId));
+
+        if (request.getStatus() == ModerationRequestStatus.APPROVED) {
+            throw new BadRequestException("Moderation request is already approved");
+        }
+
+        if (request.getStatus() == ModerationRequestStatus.REJECTED) {
+            throw new BadRequestException("Rejected moderation request cannot be approved");
+        }
+
+        User currentAdmin = currentUserService.getCurrentUserEntity();
+
+        request.setStatus(ModerationRequestStatus.APPROVED);
+        request.setModerator(currentAdmin);
+        request.setProcessedAt(OffsetDateTime.now());
+        request.setComment(null);
+
+        request.getBoard().setModerationStatus(BoardModerationStatus.APPROVED);
+
+        return boardModerationRequestMapper.toResponse(request);
+    }
+
+    @Override
+    @Transactional
+    public ModerationRequestResponse rejectModerationRequest(Long requestId, RejectModerationRequest rejectRequest) {
+        BoardModerationRequest request = boardModerationRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Moderation request not found with id: " + requestId));
+
+        if (request.getStatus() == ModerationRequestStatus.APPROVED) {
+            throw new BadRequestException("Approved moderation request cannot be rejected");
+        }
+
+        if (request.getStatus() == ModerationRequestStatus.REJECTED) {
+            throw new BadRequestException("Moderation request is already rejected");
+        }
+
+        User currentAdmin = currentUserService.getCurrentUserEntity();
+
+        request.setStatus(ModerationRequestStatus.REJECTED);
+        request.setModerator(currentAdmin);
+        request.setProcessedAt(OffsetDateTime.now());
+        request.setComment(rejectRequest.comment());
+
+        request.getBoard().setModerationStatus(BoardModerationStatus.REJECTED);
+
+        return boardModerationRequestMapper.toResponse(request);
     }
 }
