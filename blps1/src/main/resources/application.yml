@@ -35,6 +35,12 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+    consumer:
+      group-id: board-moderation-workers
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 minio:
   url: http://localhost:9000
   access-key: minioadmin
@@ -64,6 +70,9 @@ logging:
     org.springframework.transaction: DEBUG
 
 app:
+  outbox:
+    publish-delay-ms: 5000
   kafka:
+    consumer-enabled: true
     topics:
       board-moderation-requests: board-moderation-requests

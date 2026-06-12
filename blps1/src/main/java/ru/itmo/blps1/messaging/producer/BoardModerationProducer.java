@@ -15,31 +15,19 @@ public class BoardModerationProducer {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    private final ObjectMapper objectMapper;
-
     @Value("${app.kafka.topics.board-moderation-requests}")
     private String boardModerationRequestTopic;
 
-    public void sendBoardModerationRequested(BoardModerationRequestEvent event) {
-        String key = String.valueOf(event.boardId());
-        String payload = toJson(event);
+    public void sendBoardModerationRequested(Long boardId, String payload) {
+        String key = String.valueOf(boardId);
 
         kafkaTemplate.send(boardModerationRequestTopic, key, payload);
 
         log.info(
-                "Sent board moderation event to Kafka: topic={}, key={}, boardId={}, requestedBy={}",
+                "Sent board moderation event to Kafka: topic={}, key={}, payload={}",
                 boardModerationRequestTopic,
                 key,
-                event.boardId(),
-                event.requestedByUsername()
+                payload
         );
-    }
-
-    private String toJson(BoardModerationRequestEvent event) {
-        try {
-            return objectMapper.writeValueAsString(event);
-        } catch (Exception exception) {
-            throw new IllegalStateException("Failed to serialize board moderation event", exception);
-        }
     }
 }
