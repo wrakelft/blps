@@ -48,7 +48,7 @@ public class CamundaEngineConfig {
         );
 
         configuration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
-        configuration.setJobExecutorActivate(false);
+        configuration.setJobExecutorActivate(true);
 
         configuration.setBeans(camundaBeans());
 

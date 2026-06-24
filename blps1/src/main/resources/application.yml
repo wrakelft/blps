@@ -82,8 +82,10 @@ bitrix24:
 
 app:
   outbox:
+    publisher-enabled: false
     publish-delay-ms: 5000
   bitrix24:
+    retry-enabled: false
     retry-delay-ms: 30000
   kafka:
     consumer-enabled: true

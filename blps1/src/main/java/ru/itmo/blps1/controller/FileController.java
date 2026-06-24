@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.itmo.blps1.dto.file.FileUploadResponse;
+import ru.itmo.blps1.service.bpm.BusinessProcessService;
 import ru.itmo.blps1.service.storage.FileStorageService;
 
 @RestController
@@ -21,7 +22,7 @@ import ru.itmo.blps1.service.storage.FileStorageService;
 @Tag(name = "Files", description = "Technical file upload operations")
 public class FileController {
 
-    private final FileStorageService fileStorageService;
+    private final BusinessProcessService businessProcessService;
 
     @PostMapping(
             value = "/upload",
@@ -36,6 +37,6 @@ public class FileController {
             )
             @RequestParam("file")MultipartFile file
     ) {
-        return fileStorageService.uploadImage(file);
+        return businessProcessService.uploadFile(file);
     }
 }

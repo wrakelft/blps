@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_pin_create_in_board_with_file_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="pin-create-in-board-with-file-process"
+                  name="Pin create in board with file process"
+                  isExecutable="true"
+                  camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_CreatePinInBoard" name="Create pin in board requested">
+            <bpmn:outgoing>Flow_Start_To_CreatePinInBoard</bpmn:outgoing>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask id="ServiceTask_CreatePinInBoard"
+                          name="Upload file, create pin and attach to board"
+                          camunda:delegateExpression="${createPinInBoardWithFileDelegate}">
+            <bpmn:incoming>Flow_Start_To_CreatePinInBoard</bpmn:incoming>
+            <bpmn:outgoing>Flow_CreatePinInBoard_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_PinInBoardCreated" name="Pin in board created">
+            <bpmn:incoming>Flow_CreatePinInBoard_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow id="Flow_Start_To_CreatePinInBoard"
+                           sourceRef="StartEvent_CreatePinInBoard"
+                           targetRef="ServiceTask_CreatePinInBoard"/>
+
+        <bpmn:sequenceFlow id="Flow_CreatePinInBoard_To_End"
+                           sourceRef="ServiceTask_CreatePinInBoard"
+                           targetRef="EndEvent_PinInBoardCreated"/>
+
+    </bpmn:process>
+</bpmn:definitions>

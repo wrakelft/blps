@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.itmo.blps1.dto.pin.PinResponse;
+import ru.itmo.blps1.service.bpm.BusinessProcessService;
 import ru.itmo.blps1.service.pin.PinServiceInt;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 public class PinController {
 
     private final PinServiceInt pinService;
+    private final BusinessProcessService businessProcessService;
 
     @PostMapping(
             value = "/with-file",
@@ -40,7 +42,7 @@ public class PinController {
             )
             @RequestPart("file") MultipartFile file
     ) {
-        return pinService.createPinWithFile(title, description, authorId, file);
+        return businessProcessService.createPinWithFile(title, description, authorId, file);
     }
 
     @GetMapping

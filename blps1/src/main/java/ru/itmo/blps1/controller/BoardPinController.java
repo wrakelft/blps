@@ -14,6 +14,7 @@ import ru.itmo.blps1.dto.boardpin.BoardPinResponse;
 import ru.itmo.blps1.dto.boardpin.CreatePinInBoardResponse;
 import ru.itmo.blps1.dto.pin.PinResponse;
 import ru.itmo.blps1.service.boardpin.BoardPinServiceInt;
+import ru.itmo.blps1.service.bpm.BusinessProcessService;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ import java.util.List;
 public class BoardPinController {
 
     private final BoardPinServiceInt boardPinService;
+    private final BusinessProcessService businessProcessService;
 
     @PostMapping("/{boardId}/pins/{pinId}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -32,7 +34,7 @@ public class BoardPinController {
             @PathVariable Long boardId,
             @PathVariable Long pinId
     ) {
-        return boardPinService.saveExistingPinToBoard(boardId, pinId);
+        return businessProcessService.attachPinToBoard(boardId, pinId);
     }
 
     @GetMapping("/{boardId}/pins")
@@ -59,7 +61,7 @@ public class BoardPinController {
             )
             @RequestPart("file") MultipartFile file
     ) {
-        return boardPinService.createPinInBoard(
+        return businessProcessService.createPinInBoardWithFile(
                 boardId,
                 title,
                 description,

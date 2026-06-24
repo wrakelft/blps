@@ -51,13 +51,13 @@ public class BoardController {
     @Operation(summary = "Update board privacy")
     public BoardResponse updateBoardPrivacy(@PathVariable Long id,
                                             @Valid @RequestBody UpdateBoardPrivacyRequest request) {
-        return boardService.updateBoardPrivacy(id, request);
+        return businessProcessService.updateBoardPrivacy(id, request);
     }
 
     @DeleteMapping("/api/boards/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete board with all board-pin links")
     public void deleteBoard(@PathVariable Long id) {
-        boardService.deleteBoard(id);
+        businessProcessService.deleteBoard(id);
     }
 }

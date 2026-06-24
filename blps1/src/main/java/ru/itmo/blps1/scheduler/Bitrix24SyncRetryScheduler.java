@@ -1,16 +1,13 @@
 package ru.itmo.blps1.scheduler;
 
-
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import ru.itmo.blps1.service.moderation.BoardModerationServiceInt;
+import ru.itmo.blps1.service.bpm.Bitrix24SyncRetryActionService;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 @ConditionalOnProperty(
         name = "app.bitrix24.retry-enabled",
         havingValue = "true",
@@ -18,14 +15,10 @@ import ru.itmo.blps1.service.moderation.BoardModerationServiceInt;
 )
 public class Bitrix24SyncRetryScheduler {
 
-    private final BoardModerationServiceInt boardModerationService;
+    private final Bitrix24SyncRetryActionService bitrix24SyncRetryActionService;
 
     @Scheduled(fixedDelayString = "${app.bitrix24.retry-delay-ms:30000}")
     public void retryFailedBitrix24Sync() {
-        log.info("Starting scheduled retry for failed Bitrix24 sync");
-
-        boardModerationService.retryFailedExternalSync();
-
-        log.info("Finished scheduled retry for failed Bitrix24 sync");
+        bitrix24SyncRetryActionService.retryFailedBitrix24Sync();
     }
 }

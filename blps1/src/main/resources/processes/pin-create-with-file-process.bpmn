@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_pin_create_with_file_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="pin-create-with-file-process"
+                  name="Pin create with file process"
+                  isExecutable="true"
+                  camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_CreatePin" name="Create pin requested">
+            <bpmn:outgoing>Flow_Start_To_CreatePin</bpmn:outgoing>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask id="ServiceTask_CreatePin"
+                          name="Upload file and create pin"
+                          camunda:delegateExpression="${createPinWithFileDelegate}">
+            <bpmn:incoming>Flow_Start_To_CreatePin</bpmn:incoming>
+            <bpmn:outgoing>Flow_CreatePin_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_PinCreated" name="Pin created">
+            <bpmn:incoming>Flow_CreatePin_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow id="Flow_Start_To_CreatePin"
+                           sourceRef="StartEvent_CreatePin"
+                           targetRef="ServiceTask_CreatePin"/>
+
+        <bpmn:sequenceFlow id="Flow_CreatePin_To_End"
+                           sourceRef="ServiceTask_CreatePin"
+                           targetRef="EndEvent_PinCreated"/>
+
+    </bpmn:process>
+</bpmn:definitions>

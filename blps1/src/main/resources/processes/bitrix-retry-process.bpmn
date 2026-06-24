@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_bitrix_retry_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="bitrix-retry-process"
+                  name="Bitrix retry process"
+                  isExecutable="true"
+                  camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_BitrixRetryTimer" name="Bitrix retry timer">
+            <bpmn:outgoing>Flow_Start_To_RetryBitrix</bpmn:outgoing>
+            <bpmn:timerEventDefinition>
+                <bpmn:timeCycle>R/PT30S</bpmn:timeCycle>
+            </bpmn:timerEventDefinition>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask id="ServiceTask_RetryBitrix"
+                          name="Retry failed Bitrix sync"
+                          camunda:delegateExpression="${retryFailedBitrixSyncDelegate}">
+            <bpmn:incoming>Flow_Start_To_RetryBitrix</bpmn:incoming>
+            <bpmn:outgoing>Flow_RetryBitrix_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_BitrixRetryFinished" name="Bitrix retry finished">
+            <bpmn:incoming>Flow_RetryBitrix_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow id="Flow_Start_To_RetryBitrix"
+                           sourceRef="StartEvent_BitrixRetryTimer"
+                           targetRef="ServiceTask_RetryBitrix"/>
+
+        <bpmn:sequenceFlow id="Flow_RetryBitrix_To_End"
+                           sourceRef="ServiceTask_RetryBitrix"
+                           targetRef="EndEvent_BitrixRetryFinished"/>
+
+    </bpmn:process>
+</bpmn:definitions>
