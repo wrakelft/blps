@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.itmo.blps1.dto.user.CreateUserRequest;
 import ru.itmo.blps1.dto.user.UserResponse;
+import ru.itmo.blps1.service.bpm.BusinessProcessService;
 import ru.itmo.blps1.service.user.UserServiceInt;
 
 import java.util.List;
@@ -19,12 +20,13 @@ import java.util.List;
 public class UserController {
 
     private final UserServiceInt userService;
+    private final BusinessProcessService businessProcessService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create user")
     public UserResponse createUser(@Valid @RequestBody CreateUserRequest request) {
-        return userService.createUser(request);
+        return businessProcessService.createUser(request);
     }
 
     @GetMapping

@@ -57,6 +57,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/boards/*/moderation/submit").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/boards/*/privacy").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/camunda/tasks/moderation").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/camunda/tasks/*/complete-moderation").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/api/moderation/requests/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/moderation/requests/*/approve").hasRole("ADMIN")

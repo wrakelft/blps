@@ -44,7 +44,7 @@ public class Bitrix24ManagedConnection implements ManagedConnection {
 
     @Override
     public void cleanup() throws ResourceException {
-
+        // rest client не держит состояния
     }
 
     @Override

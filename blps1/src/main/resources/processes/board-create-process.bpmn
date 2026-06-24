@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+        xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+        xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_board_create_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="board-create-process" name="Board create process" isExecutable="true" camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_CreateBoard" name="Board creation requested">
+            <bpmn:outgoing>Flow_Start_To_CreateBoard</bpmn:outgoing>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask
+                id="ServiceTask_CreateBoard"
+                name="Create board in application"
+                camunda:delegateExpression="${createBoardDelegate}">
+            <bpmn:incoming>Flow_Start_To_CreateBoard</bpmn:incoming>
+            <bpmn:outgoing>Flow_CreateBoard_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_BoardCreated" name="Board created">
+            <bpmn:incoming>Flow_CreateBoard_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow
+                id="Flow_Start_To_CreateBoard"
+                sourceRef="StartEvent_CreateBoard"
+                targetRef="ServiceTask_CreateBoard"/>
+
+        <bpmn:sequenceFlow
+                id="Flow_CreateBoard_To_End"
+                sourceRef="ServiceTask_CreateBoard"
+                targetRef="EndEvent_BoardCreated"/>
+
+    </bpmn:process>
+
+    <bpmndi:BPMNDiagram id="BPMNDiagram_board_create_process">
+        <bpmndi:BPMNPlane id="BPMNPlane_board_create_process" bpmnElement="board-create-process">
+
+            <bpmndi:BPMNShape id="StartEvent_CreateBoard_di" bpmnElement="StartEvent_CreateBoard">
+                <dc:Bounds x="160" y="100" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+
+            <bpmndi:BPMNShape id="ServiceTask_CreateBoard_di" bpmnElement="ServiceTask_CreateBoard">
+                <dc:Bounds x="260" y="78" width="180" height="80"/>
+            </bpmndi:BPMNShape>
+
+            <bpmndi:BPMNShape id="EndEvent_BoardCreated_di" bpmnElement="EndEvent_BoardCreated">
+                <dc:Bounds x="520" y="100" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+
+            <bpmndi:BPMNEdge id="Flow_Start_To_CreateBoard_di" bpmnElement="Flow_Start_To_CreateBoard">
+                <di:waypoint x="196" y="118"/>
+                <di:waypoint x="260" y="118"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="Flow_CreateBoard_To_End_di" bpmnElement="Flow_CreateBoard_To_End">
+                <di:waypoint x="440" y="118"/>
+                <di:waypoint x="520" y="118"/>
+            </bpmndi:BPMNEdge>
+
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

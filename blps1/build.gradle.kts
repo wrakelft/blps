@@ -46,6 +46,10 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     testImplementation("org.springframework.kafka:spring-kafka-test")
     implementation("jakarta.resource:jakarta.resource-api:2.1.0")
+    implementation("org.camunda.bpm:camunda-engine:7.23.0")
+    implementation("org.camunda.bpm.model:camunda-bpmn-model:7.23.0")
+    implementation("org.camunda.bpm:camunda-engine-plugin-spin:7.23.0")
+    implementation("org.camunda.spin:camunda-spin-dataformat-json-jackson:1.23.0")
 }
 
 tasks.withType<Test> {

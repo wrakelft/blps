@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.itmo.blps1.dto.moderation.SubmitBoardModerationResponse;
+import ru.itmo.blps1.service.bpm.BusinessProcessService;
 import ru.itmo.blps1.service.moderation.BoardModerationServiceInt;
 
 @RestController
@@ -11,11 +12,11 @@ import ru.itmo.blps1.service.moderation.BoardModerationServiceInt;
 @RequiredArgsConstructor
 public class BoardModerationController {
 
-    private final BoardModerationServiceInt boardModerationService;
+    private final BusinessProcessService businessProcessService;
 
     @PostMapping("/submit")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public SubmitBoardModerationResponse submitBoardForModeration(@PathVariable Long boardId) {
-        return boardModerationService.submitBoardForModeration(boardId);
+        return businessProcessService.submitBoardForModeration(boardId);
     }
 }

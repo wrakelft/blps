@@ -1,6 +1,13 @@
 spring:
   jta:
     enabled: true
+    atomikos:
+      datasource:
+        min-pool-size: 3
+        max-pool-size: 20
+        borrow-connection-timeout: 60
+        max-idle-time: 60
+        maintenance-interval: 60
 
   datasource:
     xa:
@@ -82,3 +89,9 @@ app:
     consumer-enabled: true
     topics:
       board-moderation-requests: board-moderation-requests
+
+camunda:
+  bpm:
+    database-schema-update: true
+    history-level: full
+    deployment-resource-pattern: classpath*:/processes/*.bpmn

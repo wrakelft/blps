@@ -1,5 +1,6 @@
 package ru.itmo.blps1.messaging.consumer;
 
+import ru.itmo.blps1.service.bpm.BusinessProcessService;
 import tools.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +8,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import ru.itmo.blps1.messaging.event.BoardModerationRequestEvent;
-import ru.itmo.blps1.service.moderation.BoardModerationServiceInt;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +21,7 @@ public class BoardModerationConsumer {
 
     private final ObjectMapper objectMapper;
 
-    private final BoardModerationServiceInt boardModerationService;
+    private final BusinessProcessService businessProcessService;
 
     @KafkaListener(
             topics = "${app.kafka.topics.board-moderation-requests}",
@@ -32,7 +32,7 @@ public class BoardModerationConsumer {
 
         BoardModerationRequestEvent event = fromJson(payload);
 
-        boardModerationService.processBoardModeration(event);
+        businessProcessService.correlateBoardModerationRequested(event);
 
         log.info(
                 "Processed board moderation event: boardId={}, requestedBy={}",

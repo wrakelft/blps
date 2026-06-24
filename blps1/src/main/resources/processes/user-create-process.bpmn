@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_user_create_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="user-create-process"
+                  name="User create process"
+                  isExecutable="true"
+                  camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_CreateUser" name="Create user requested">
+            <bpmn:outgoing>Flow_Start_To_CreateUser</bpmn:outgoing>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask id="ServiceTask_CreateUser"
+                          name="Validate and create user"
+                          camunda:delegateExpression="${createUserDelegate}">
+            <bpmn:incoming>Flow_Start_To_CreateUser</bpmn:incoming>
+            <bpmn:outgoing>Flow_CreateUser_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_UserCreated" name="User created">
+            <bpmn:incoming>Flow_CreateUser_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow id="Flow_Start_To_CreateUser"
+                           sourceRef="StartEvent_CreateUser"
+                           targetRef="ServiceTask_CreateUser"/>
+
+        <bpmn:sequenceFlow id="Flow_CreateUser_To_End"
+                           sourceRef="ServiceTask_CreateUser"
+                           targetRef="EndEvent_UserCreated"/>
+
+    </bpmn:process>
+</bpmn:definitions>

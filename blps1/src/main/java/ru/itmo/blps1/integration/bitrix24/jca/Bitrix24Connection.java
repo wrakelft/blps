@@ -6,6 +6,9 @@ import ru.itmo.blps1.entity.Board;
 import ru.itmo.blps1.entity.BoardModerationRequest;
 import ru.itmo.blps1.integration.corporate.dto.ExternalModerationTask;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class Bitrix24Connection implements AutoCloseable {
@@ -108,20 +111,24 @@ public class Bitrix24Connection implements AutoCloseable {
             return;
         }
 
-        if (webhookUrl == null || webhookUrl.isBlank()) {
+        String baseUrl = normalizeWebhookUrl();
+
+        if (baseUrl == null) {
             return;
         }
 
-        Map<String, Object> body = Map.of(
-                "TASKID", Long.valueOf(externalTaskId),
-                "FIELDS", Map.of(
-                        "POST_MESSAGE", comment
-                )
+        Long taskId = Long.valueOf(externalTaskId);
+        String encodedComment = URLEncoder.encode(comment, StandardCharsets.UTF_8);
+
+        URI uri = URI.create(
+                baseUrl
+                        + "task.commentitem.add"
+                        + "?TASKID=" + taskId
+                        + "&FIELDS[POST_MESSAGE]=" + encodedComment
         );
 
         restClient.post()
-                .uri(webhookUrl + "task.commentitem.add")
-                .body(body)
+                .uri(uri)
                 .retrieve()
                 .toBodilessEntity();
     }
@@ -133,17 +140,22 @@ public class Bitrix24Connection implements AutoCloseable {
             return;
         }
 
-        if (webhookUrl == null || webhookUrl.isBlank()) {
+        String baseUrl = normalizeWebhookUrl();
+
+        if (baseUrl == null) {
             return;
         }
 
-        Map<String, Object> body = Map.of(
-                "taskId", Long.valueOf(externalTaskId)
+        Long taskId = Long.valueOf(externalTaskId);
+
+        URI uri = URI.create(
+                baseUrl
+                        + "tasks.task.complete"
+                        + "?taskId=" + taskId
         );
 
         restClient.post()
-                .uri(webhookUrl + "tasks.task.complete")
-                .body(body)
+                .uri(uri)
                 .retrieve()
                 .toBodilessEntity();
     }
@@ -166,5 +178,27 @@ public class Bitrix24Connection implements AutoCloseable {
     public record Bitrix24Task(
             Long id
     ) {
+    }
+
+    private String normalizeWebhookUrl() {
+        if (webhookUrl == null || webhookUrl.isBlank()) {
+            return null;
+        }
+
+        String normalized = webhookUrl.trim();
+
+        if (normalized.startsWith("https:/") && !normalized.startsWith("https://")) {
+            normalized = "https://" + normalized.substring("https:/".length());
+        }
+
+        if (normalized.startsWith("http:/") && !normalized.startsWith("http://")) {
+            normalized = "http://" + normalized.substring("http:/".length());
+        }
+
+        if (!normalized.endsWith("/")) {
+            normalized += "/";
+        }
+
+        return normalized;
     }
 }

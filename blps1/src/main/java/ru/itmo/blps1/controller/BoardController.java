@@ -10,6 +10,7 @@ import ru.itmo.blps1.dto.board.BoardResponse;
 import ru.itmo.blps1.dto.board.CreateBoardRequest;
 import ru.itmo.blps1.dto.board.UpdateBoardPrivacyRequest;
 import ru.itmo.blps1.service.board.BoardServiceInt;
+import ru.itmo.blps1.service.bpm.BusinessProcessService;
 
 import java.util.List;
 
@@ -19,12 +20,13 @@ import java.util.List;
 public class BoardController {
 
     private final BoardServiceInt boardService;
+    private final BusinessProcessService businessProcessService;
 
     @PostMapping("/api/boards")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create board")
     public BoardResponse createBoard(@Valid @RequestBody CreateBoardRequest request) {
-        return boardService.createBoard(request);
+        return businessProcessService.createBoard(request);
     }
 
     @GetMapping("/api/boards")

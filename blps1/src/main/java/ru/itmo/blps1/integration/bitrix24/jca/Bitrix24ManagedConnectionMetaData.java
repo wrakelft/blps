@@ -11,7 +11,7 @@ public class Bitrix24ManagedConnectionMetaData implements ManagedConnectionMetaD
 
     @Override
     public String getEISProductVersion() throws ResourceException {
-        return "REST APO";
+        return "REST API";
     }
 
     @Override

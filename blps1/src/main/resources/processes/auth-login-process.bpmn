@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_auth_login_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="auth-login-process"
+                  name="Auth login process"
+                  isExecutable="true"
+                  camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_Login" name="Login requested">
+            <bpmn:outgoing>Flow_Start_To_Authenticate</bpmn:outgoing>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask id="ServiceTask_Authenticate"
+                          name="Authenticate via JAAS and generate JWT"
+                          camunda:delegateExpression="${authLoginDelegate}">
+            <bpmn:incoming>Flow_Start_To_Authenticate</bpmn:incoming>
+            <bpmn:outgoing>Flow_Authenticate_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_LoginFinished" name="Login finished">
+            <bpmn:incoming>Flow_Authenticate_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow id="Flow_Start_To_Authenticate"
+                           sourceRef="StartEvent_Login"
+                           targetRef="ServiceTask_Authenticate"/>
+
+        <bpmn:sequenceFlow id="Flow_Authenticate_To_End"
+                           sourceRef="ServiceTask_Authenticate"
+                           targetRef="EndEvent_LoginFinished"/>
+
+    </bpmn:process>
+</bpmn:definitions>
