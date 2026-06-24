@@ -1,0 +1,1791 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: My first collection
+meta:
+  id: wrk_730ab1e94c7d41d28fa36e916e1910d2
+  created: 1782320526679
+  modified: 1782320526679
+  description: ""
+collection:
+  - name: User
+    meta:
+      id: fld_a73de333b64e4640a6e621548db6432b
+      created: 1775771777029
+      modified: 1781284446547
+      sortKey: -1775771777030
+      description: ""
+    children:
+      - url: "{{ baseUrl }}/api/users"
+        name: Create User
+        meta:
+          id: req_7d698d8b4a9d47dbbc46e15064b6fcc8
+          created: 1775772004883
+          modified: 1782322622618
+          isPrivate: false
+          description: ""
+          sortKey: -1775772004883
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "username": "admin",
+              "email": "admin@example.com"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/users"
+        name: Get All Users
+        meta:
+          id: req_371579d5ae5943a09a0b6d1f03e230fa
+          created: 1775772060164
+          modified: 1775772093921
+          isPrivate: false
+          description: ""
+          sortKey: -1775772060164
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/users/{{ userId }}"
+        name: Get User By Id
+        meta:
+          id: req_34a9a30d303247dd9b012d56bb68eeb7
+          created: 1775772100499
+          modified: 1775772145071
+          isPrivate: false
+          description: ""
+          sortKey: -1775772100499
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{baseUrl}}/api/auth/login"
+        name: Login
+        meta:
+          id: req_a8da4d224d45435d9fde86ed4b450165
+          created: 1780090049315
+          modified: 1780096880084
+          isPrivate: false
+          description: ""
+          sortKey: -1780090049315
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "username": "gleb",
+              "password": "1234"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Boards
+    meta:
+      id: fld_b13e43e301eb424d82f1a6a35a0b2fe3
+      created: 1775771786022
+      modified: 1781284838030
+      sortKey: -1775771786022
+      description: ""
+    children:
+      - url: "{{ baseUrl }}/api/boards"
+        name: Create first board
+        meta:
+          id: req_8a29c977fc084a0dbdebcc9be0a5a474
+          created: 1775772153113
+          modified: 1780093558839
+          isPrivate: false
+          description: ""
+          sortKey: -1775772153113
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "Test",
+              "description": "Funny pins",
+              "privacy": "PUBLIC",
+              "ownerId": {{ userId }}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJnbGViIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3ODAwOTEyODIsImV4cCI6MTc4MDA5ODQ4Mn0.g-WkfWF9MSt8acGflwcsM5qH7zo289sOQLrQUedMit_8AaQ8x1oSccfijCdi6mKM
+            description: ""
+            disabled: false
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards"
+        name: Create second board
+        meta:
+          id: req_1ee905935bae4c5390a5c79c3e3f4ef4
+          created: 1775772210468
+          modified: 1775772271647
+          isPrivate: false
+          description: ""
+          sortKey: -1775772210468
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "Cats",
+              "description": "Cat inspiration",
+              "privacy": "PRIVATE",
+              "ownerId": {{ userId }}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards"
+        name: Get All boards
+        meta:
+          id: req_2ff150a1d55947a0b7b18081e59e608f
+          created: 1775772275559
+          modified: 1782328157747
+          isPrivate: false
+          description: ""
+          sortKey: -1775772275559
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/users/{{ userId }}/boards"
+        name: Get Boards By User Id
+        meta:
+          id: req_c73928e3d8e14a15be57bdb105721088
+          created: 1775772341065
+          modified: 1780088518585
+          isPrivate: false
+          description: ""
+          sortKey: -1775772341065
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/3/privacy"
+        name: Update privacy
+        meta:
+          id: req_ace568eceb3b46adbb8a9cc550d7766d
+          created: 1780088364858
+          modified: 1780092240965
+          isPrivate: false
+          description: ""
+          sortKey: -1780088364858
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "privacy": "PUBLIC"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJnbGViIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3ODAwOTEyODIsImV4cCI6MTc4MDA5ODQ4Mn0.g-WkfWF9MSt8acGflwcsM5qH7zo289sOQLrQUedMit_8AaQ8x1oSccfijCdi6mKM
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Files
+    meta:
+      id: fld_c1f6a120bb97417abced3895c39d2a02
+      created: 1775771793430
+      modified: 1781285021528
+      sortKey: -1775771793430
+      description: ""
+    children:
+      - url: "{{ baseUrl }}/api/files/upload"
+        name: Upload Image
+        meta:
+          id: req_5b9b977314144f9fb55bd712415ea445
+          created: 1775772391901
+          modified: 1782327396912
+          isPrivate: false
+          description: ""
+          sortKey: -1775772391901
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: file
+              value: ""
+              description: ""
+              disabled: false
+              fileName: C:\Users\gleb\Pictures\td7ECqyXNuw.jpg
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{userToken}}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Pins
+    meta:
+      id: fld_a9e2f3fc2814456c8a570985513d485f
+      created: 1775771798885
+      modified: 1781285043325
+      sortKey: -1775771798885
+      description: ""
+    children:
+      - url: "{{ baseUrl }}/api/pins/with-file"
+        name: Create Pin with file
+        meta:
+          id: req_3656895c26d04b03a01db55d33b2c5bf
+          created: 1775772455064
+          modified: 1782327940745
+          isPrivate: false
+          description: ""
+          sortKey: -1775772455064
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: title
+              value: Funny cat
+              description: ""
+              disabled: false
+            - name: description
+              value: Mem cat pin
+              description: ""
+              disabled: false
+            - name: authorId
+              value: "1"
+              description: ""
+              disabled: false
+            - name: file
+              value: ""
+              description: ""
+              disabled: false
+              fileName: C:\Users\gleb\Pictures\пьет бэбру.jpg
+              type: file
+            - name: Authorization
+              value: Bearer
+                eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJnbGViIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3ODAwOTM1MzUsImV4cCI6MTc4MDEwMDczNX0.qnbllz5Bh06v8JFQ0GLmmL4VEH3N_0MqzSvrhf06AVb5o0TlUrVGh_Ogpap-mUVB
+              description: ""
+              disabled: false
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{userToken}}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/pins"
+        name: Get All Pins
+        meta:
+          id: req_ef08e5180d7b420cbc71f54398d0ca80
+          created: 1775772605341
+          modified: 1782327984004
+          isPrivate: false
+          description: ""
+          sortKey: -1775772605341
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{userToken}}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/pins/{{ pinId }}"
+        name: Get Pin By Id
+        meta:
+          id: req_2df10eea5ac34c6a86ecfac8e1cbd7ef
+          created: 1775772632406
+          modified: 1775772672759
+          isPrivate: false
+          description: ""
+          sortKey: -1775772632406
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Board-Pin
+    meta:
+      id: fld_e7a4319f140d4b3ca278e05173685ce5
+      created: 1775771806192
+      modified: 1781285922836
+      sortKey: -1775771792504
+      description: ""
+    children:
+      - url: "{{ baseUrl }}/api/boards/10/pins/5"
+        name: Save existing pin to board
+        meta:
+          id: req_993ba1d9092e450894a05fe09b559595
+          created: 1775772684996
+          modified: 1780097290923
+          isPrivate: false
+          description: ""
+          sortKey: -1775772684996
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJnbGViIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3ODAwOTM1MzUsImV4cCI6MTc4MDEwMDczNX0.qnbllz5Bh06v8JFQ0GLmmL4VEH3N_0MqzSvrhf06AVb5o0TlUrVGh_Ogpap-mUVB
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/2/pins/1"
+        name: Save existing pin to second board
+        meta:
+          id: req_1cb89fff956446749b28eb282bdf61c7
+          created: 1775772750142
+          modified: 1782328128687
+          isPrivate: false
+          description: ""
+          sortKey: -1775772750142
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{userToken}}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/11/pins"
+        name: Get Pins Of Board by user
+        meta:
+          id: req_918a000cc150464589fae5d3cb29796e
+          created: 1775772805945
+          modified: 1780098952244
+          isPrivate: false
+          description: ""
+          sortKey: -1775772805945
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJnbGViIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3ODAwOTM1MzUsImV4cCI6MTc4MDEwMDczNX0.qnbllz5Bh06v8JFQ0GLmmL4VEH3N_0MqzSvrhf06AVb5o0TlUrVGh_Ogpap-mUVB
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/24/pins"
+        name: Get Pins Of Second Board
+        meta:
+          id: req_d3de8127f7b84862be8eccd89484b100
+          created: 1775772835212
+          modified: 1781276422579
+          isPrivate: false
+          description: ""
+          sortKey: -1775772835212
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/2/pins/with-file"
+        name: Create New Pin In Board
+        meta:
+          id: req_5bb9784eab724c80ac02b5b9e799d9d0
+          created: 1775772894275
+          modified: 1782328081552
+          isPrivate: false
+          description: ""
+          sortKey: -1775772894275
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: title
+              value: Board cat
+              description: ""
+              disabled: false
+            - name: description
+              value: Created in board
+              description: ""
+              disabled: false
+            - name: authorId
+              value: "1"
+              description: ""
+              disabled: false
+            - name: file
+              value: ""
+              description: ""
+              disabled: false
+              fileName: C:\Users\gleb\Pictures\p6cfrv6JELY.jpg
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{userToken}}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/11/pins"
+        name: Get Pins Of Board by admin
+        meta:
+          id: req_b3bccbdd30c54b40b25ad7c368eb8eec
+          created: 1780098958819
+          modified: 1780098974862
+          isPrivate: false
+          description: ""
+          sortKey: -1775772778043.5
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIkFETUlOIl0sImlhdCI6MTc4MDA5Mzc0OCwiZXhwIjoxNzgwMTAwOTQ4fQ.0U_fzd6fKeCiS4oKn54X8DNPBQhHUc904YL2aig7LAHOObC5RsDqMdvT_mjuQG-D
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Negative cases
+    meta:
+      id: fld_196fedba0d1f45f68a648e7b4b7d3a44
+      created: 1775771814320
+      modified: 1780093894404
+      sortKey: -1775771810256
+      description: ""
+    children:
+      - url: "{{ baseUrl }}/api/users"
+        name: Duplicate User
+        meta:
+          id: req_e353199f8c6e4c9a80d7ee246bacace8
+          created: 1775773009944
+          modified: 1775773066032
+          isPrivate: false
+          description: ""
+          sortKey: -1775773009944
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"username": "gleb",
+            	"email": "gleb@example.com"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards"
+        name: Board for missing user
+        meta:
+          id: req_916d8e32b0b84ef8b23662a33f3eb073
+          created: 1775773098233
+          modified: 1775773126656
+          isPrivate: false
+          description: ""
+          sortKey: -1775773098233
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "Ghost board",
+              "description": "Should fail",
+              "privacy": "PUBLIC",
+              "ownerId": 9999
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards"
+        name: Duplicate board
+        meta:
+          id: req_cea88b5485084b80a7c7e7345282b6e4
+          created: 1775773131840
+          modified: 1775774221332
+          isPrivate: false
+          description: ""
+          sortKey: -1775773131840
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "Memes",
+              "description": "Duplicate board",
+              "privacy": "PUBLIC",
+              "ownerId": {{ userId }}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/files/upload"
+        name: Upload Empty File
+        meta:
+          id: req_ace058ac0f16474f80faed7c3fdf2762
+          created: 1775773200749
+          modified: 1775773244923
+          isPrivate: false
+          description: ""
+          sortKey: -1775773200749
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: file
+              value: ""
+              description: ""
+              disabled: false
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/files/upload"
+        name: Upload Non-Image File
+        meta:
+          id: req_f2ce054e0c244cbfacb92ab68e1ad67f
+          created: 1775773327121
+          modified: 1775773377383
+          isPrivate: false
+          description: ""
+          sortKey: -1775773327121
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: file
+              value: ""
+              description: ""
+              disabled: false
+              fileName: C:\Users\gleb\OneDrive\Рабочий стол\пинтерест бпмн.bpmn
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/9999/pins/{{ pinId }}"
+        name: Save Pin To Missing Board
+        meta:
+          id: req_2d3ba1ed53634804ba52e97b740213de
+          created: 1775773389720
+          modified: 1775773432246
+          isPrivate: false
+          description: ""
+          sortKey: -1775773389720
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/pins/with-file"
+        name: Create Pin With Missing Author
+        meta:
+          id: req_7489b7b4f9f840dcbef9f7c7dfb197f3
+          created: 1775773456958
+          modified: 1775773535501
+          isPrivate: false
+          description: ""
+          sortKey: -1775773456958
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: title
+              value: Ghost pin
+              description: ""
+              disabled: false
+            - name: description
+              value: Should fail
+              description: ""
+              disabled: false
+            - name: authorId
+              value: "9999"
+              description: ""
+              disabled: false
+            - name: file
+              value: ""
+              description: ""
+              disabled: false
+              fileName: C:\Users\gleb\OneDrive\Изображения\всякое\59461869da1a6eb05b65d348b0b91672.jpg
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{baseUrl}}/api/boards/5"
+        name: Delete board admin by user
+        meta:
+          id: req_b7cf4de5a0094baf97ddca02fd4ebfe1
+          created: 1780088459263
+          modified: 1782320678113
+          isPrivate: false
+          description: ""
+          sortKey: -1775773054088.5
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJnbGViIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3ODAwOTM1MzUsImV4cCI6MTc4MDEwMDczNX0.qnbllz5Bh06v8JFQ0GLmmL4VEH3N_0MqzSvrhf06AVb5o0TlUrVGh_Ogpap-mUVB
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: lab2
+    meta:
+      id: fld_142af71f835c4f3dafebe82e928f2df5
+      created: 1780099196828
+      modified: 1781284654121
+      sortKey: -1775771789726
+      description: ""
+    children:
+      - url: "{{ baseUrl }}/api/boards/3"
+        name: Get board by Id
+        meta:
+          id: req_765d9fc8962940a086d2aa949d9e6e82
+          created: 1775772304073
+          modified: 1780135547917
+          isPrivate: false
+          description: ""
+          sortKey: -1780094640268
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/1/privacy"
+        name: Update privacy from user
+        meta:
+          id: req_4f771e88cdd44efb9b3c120d4a763920
+          created: 1780093673422
+          modified: 1782323765965
+          isPrivate: false
+          description: ""
+          sortKey: -1780099231871
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "privacy": "PRIVATE"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{userToken}}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards"
+        name: Create first board from admin
+        meta:
+          id: req_aa0005bd3a80443dbc3a87b1185c8b34
+          created: 1780093731117
+          modified: 1780135578550
+          isPrivate: false
+          description: ""
+          sortKey: -1780099231877.25
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "Test Admin th",
+              "description": "Funny pins",
+              "privacy": "PRIVATE",
+              "ownerId": {{ userId }}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIkFETUlOIl0sImlhdCI6MTc4MDEzNTQ3MCwiZXhwIjoxNzgwMTQyNjcwfQ.lrWpmE34ZbnwYmsA6b60oX6IdqfrKLZkL13sCfTjAT6e0gcmQ_KOzHycoPHIDA0qdTQLTCocr8hD-gjDoH-28A
+            description: ""
+            disabled: false
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{baseUrl}}/api/boards/1"
+        name: Delete board
+        meta:
+          id: req_152d2e5fb4604aa4ab2c92098bd80e7e
+          created: 1780093877972
+          modified: 1782323885476
+          isPrivate: false
+          description: ""
+          sortKey: -1780094640249.25
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{userToken}}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/4"
+        name: Get board by Id for user
+        meta:
+          id: req_fa015013db0b4769bab2c24fcc7cfa25
+          created: 1780098700611
+          modified: 1780135618779
+          isPrivate: false
+          description: ""
+          sortKey: -1780094640293
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbGViIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3ODAxMzU0MTUsImV4cCI6MTc4MDE0MjYxNX0.PeEDL_GVmmYS8wQ_tldAioTYhb284x8bsapPLAeAgu4_vaV3Nt9rbHsAn6DkUvfTyibt8rKOsAnFPVzqMtBnag
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/3"
+        name: Get board by Id for admin
+        meta:
+          id: req_1adc165545824f75b9fe2a659779d541
+          created: 1780098788903
+          modified: 1780135626951
+          isPrivate: false
+          description: ""
+          sortKey: -1780094640255.5
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIkFETUlOIl0sImlhdCI6MTc4MDEzNTQ3MCwiZXhwIjoxNzgwMTQyNjcwfQ.lrWpmE34ZbnwYmsA6b60oX6IdqfrKLZkL13sCfTjAT6e0gcmQ_KOzHycoPHIDA0qdTQLTCocr8hD-gjDoH-28A
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{baseUrl}}/api/auth/login"
+        name: Login
+        meta:
+          id: req_183c006e00774aacb0e828057024d3fe
+          created: 1780099223807
+          modified: 1780099423776
+          isPrivate: false
+          description: ""
+          sortKey: -1780099231971
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "username": "gleb",
+              "password": "1234"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards"
+        name: Create first board without token
+        meta:
+          id: req_b4fabda3820c429f9aa39081c59e13c3
+          created: 1780099293693
+          modified: 1780135509405
+          isPrivate: false
+          description: ""
+          sortKey: -1780099231896
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "TestD",
+              "description": "Funny pins",
+              "privacy": "PUBLIC",
+              "ownerId": {{ userId }}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJnbGViIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3ODAwOTEyODIsImV4cCI6MTc4MDA5ODQ4Mn0.g-WkfWF9MSt8acGflwcsM5qH7zo289sOQLrQUedMit_8AaQ8x1oSccfijCdi6mKM
+            description: ""
+            disabled: false
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: lab3
+    meta:
+      id: fld_82e406359b984c91b7f1af3fa682f83f
+      created: 1781284455184
+      modified: 1781287727219
+      sortKey: -1775771791578
+      description: ""
+    children:
+      - url: "{{ baseUrl }}/api/boards"
+        name: Create first board from user
+        meta:
+          id: req_33b4018bcb3446cfa59273968d33f9bc
+          created: 1780093604336
+          modified: 1782328066976
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542788
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "test camunda pin",
+              "description": "reject",
+              "privacy": "PUBLIC",
+              "ownerId": 1
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{ userToken}}
+            description: ""
+            disabled: false
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{baseUrl}}/api/auth/login"
+        name: Login admin
+        meta:
+          id: req_c1c48037ab8847e68c4a4afdf313b447
+          created: 1780099244439
+          modified: 1781284549257
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542813
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "username": "admin",
+              "password": "admin"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{baseUrl}}/api/auth/login"
+        name: Login gleb
+        meta:
+          id: req_7858e66b7d5d4ac7a58fba26e0d7fe55
+          created: 1781284530666
+          modified: 1782298268518
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542913
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "username": "gleb",
+              "password": "1234"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{baseUrl}}/api/auth/login"
+        name: Login userOne
+        meta:
+          id: req_c4b7ad57b45842e0a4420d47e639dd90
+          created: 1781284560765
+          modified: 1781284573669
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542863
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "username": "one",
+              "password": "123"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards"
+        name: Get All boards by One
+        meta:
+          id: req_aa4f9ed3f0834f06b730b63b0d8637c3
+          created: 1781284656484
+          modified: 1782327372180
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542763
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{oneToken}}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/6/pins/with-file"
+        name: Create New Pin In Board
+        meta:
+          id: req_2b4926408fcb49a2a53a6d7719deab83
+          created: 1781284868487
+          modified: 1781286394817
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542663
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: title
+              value: Board cat
+              description: ""
+              disabled: false
+            - name: description
+              value: Created in board
+              description: ""
+              disabled: false
+            - name: authorId
+              value: "1"
+              description: ""
+              disabled: false
+            - name: file
+              value: ""
+              description: ""
+              disabled: false
+              fileName: C:\Users\gleb\OneDrive\Изображения\Снимки экрана\Screenshot 2026-06-05
+                204905.png
+              type: file
+        headers:
+          - name: Content-Type
+            value: multipart/form-data
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{ userToken }}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/pins"
+        name: Get All Pins
+        meta:
+          id: req_78c98a7a58794aa58be4be94e655ea95
+          created: 1781285026038
+          modified: 1781285049837
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542563
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/pins/1"
+        name: Get Pin By Id
+        meta:
+          id: req_736a93d350b344ebb06d30a3bf395d0c
+          created: 1781285028178
+          modified: 1781285110141
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542613
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{ oneToken }}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/2/moderation/submit"
+        name: Submit Board By User
+        meta:
+          id: req_1d31746433064b06ad1799a793eebb64
+          created: 1781285153991
+          modified: 1782340681276
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542463
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/12.6.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{ userToken }}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/moderation/requests"
+        name: Request List By Admin
+        meta:
+          id: req_428c5b30800f45b3b41aa9cdde9d69d1
+          created: 1781285391670
+          modified: 1781285437871
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542363
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.6.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{ adminToken }}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards/2/pins"
+        name: Get Pins Of Board by admin
+        meta:
+          id: req_f58dc37a4f7044b89ea09c2f341b50a5
+          created: 1781285480672
+          modified: 1782328183256
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542263
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{ adminToken }}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards"
+        name: Get All boards by Admin
+        meta:
+          id: req_734d6edcda7446efb3a570f11ded66dc
+          created: 1781285528769
+          modified: 1781285540281
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542313
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{ adminToken}}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/camunda/tasks/2573/complete-moderation"
+        name: Approve By Admin
+        meta:
+          id: req_226d49c9a1d14105aab78ae3f52338af
+          created: 1781285576270
+          modified: 1782340733403
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542163
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "decision": "APPROVED",
+              "comment": null
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.6.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{ adminToken }}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/camunda/tasks/1410/complete-moderation"
+        name: Reject By Admin
+        meta:
+          id: req_02a39125c2a0440296bd2e0b1875bd5c
+          created: 1781285638888
+          modified: 1782313023120
+          isPrivate: false
+          description: ""
+          sortKey: -1781283509484.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "decision": "REJECTED",
+              "comment": "Board fu"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.6.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{ adminToken }}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ baseUrl }}/api/boards"
+        name: Get All boards by User
+        meta:
+          id: req_b1271c2180f34224bc0533c0a99cf242
+          created: 1781285727907
+          modified: 1781285744569
+          isPrivate: false
+          description: ""
+          sortKey: -1781283509384.5
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{ userToken }}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{baseUrl}}/api/camunda/tasks/moderation"
+        name: New Request
+        meta:
+          id: req_92452bf779934976a460591d4e879742
+          created: 1782309614258
+          modified: 1782312494874
+          isPrivate: false
+          description: ""
+          sortKey: -1781284542713
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.6.0
+            description: ""
+            disabled: false
+          - name: Authorization
+            value: Bearer {{adminToken}}
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - name: Negative
+        meta:
+          id: fld_ed6ff507b68f4b27907b0feb1effcabd
+          created: 1781285814676
+          modified: 1781287748760
+          sortKey: -1781285814676
+          description: ""
+        children:
+          - url: "{{ baseUrl }}/api/moderation/requests/1/approve"
+            name: Approve By User
+            meta:
+              id: req_eac77d71be1c46a084f4c43c43c03cc9
+              created: 1781285827586
+              modified: 1781285852333
+              isPrivate: false
+              description: ""
+              sortKey: -1781285839260
+            method: POST
+            headers:
+              - name: User-Agent
+                value: insomnia/12.6.0
+                description: ""
+                disabled: false
+              - name: Authorization
+                value: Bearer {{ userToken }}
+                description: ""
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ baseUrl }}/api/moderation/requests/1/reject"
+            name: Reject By User
+            meta:
+              id: req_d9ff5f8d064c4f7eba0f923b65771bb2
+              created: 1781285870336
+              modified: 1781285877914
+              isPrivate: false
+              description: ""
+              sortKey: -1781285191086.5
+            method: POST
+            headers:
+              - name: User-Agent
+                value: insomnia/12.6.0
+                description: ""
+                disabled: false
+              - name: Authorization
+                value: Bearer {{ userToken }}
+                description: ""
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ baseUrl }}/api/moderation/requests"
+            name: Request List By User
+            meta:
+              id: req_24a1a543184f4e9a89133e3457e4cf0f
+              created: 1781285887096
+              modified: 1781285913291
+              isPrivate: false
+              description: ""
+              sortKey: -1781285839310
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/12.6.0
+                description: ""
+                disabled: false
+              - name: Authorization
+                value: Bearer {{ userToken }}
+                description: ""
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_9e3c9ecac43f4bf2ba550e13fef81b43
+    created: 1775771715642
+    modified: 1775771715642
+environments:
+  name: Base Environment
+  meta:
+    id: env_ee43e6efaa5543209684c847da1f3492
+    created: 1775771715638
+    modified: 1782340714708
+    isPrivate: false
+  data:
+    baseUrl: http://localhost:8080
+    userToken: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJnbGViIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3ODIzNDA2NDEsImV4cCI6MTc4MjM0Nzg0MX0.xLyomCwJEv4cTZ_0-HMffKqkJkPii7aiaxsoXJvPswunpQwmpkI6lyT_rVT8x6hh
+    adminToken: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIkFETUlOIl0sImlhdCI6MTc4MjM0MDcwMiwiZXhwIjoxNzgyMzQ3OTAyfQ.gtwde3-FGa1gv_N7JQpne_sq9QvP7gTAU1-9q1aGgnhPqvrZUPtRMw1eIksgA3pk
+    oneToken: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvbmUiLCJyb2xlcyI6WyJVU0VSIl0sImlhdCI6MTc4MTI4NjMxMiwiZXhwIjoxNzgxMjkzNTEyfQ.DlP-bBtngRIhPQYDpwvWW3E1WesZ0vTl6uhO2lWnqyazVdsfxDom4PD237qCf5GLgEX0dLTtPxFQc9O1LuIHVg
