@@ -31,6 +31,9 @@ public class CamundaEngineConfig {
     @Value("${camunda.bpm.deployment-resource-pattern:classpath*:/processes/*.bpmn}")
     private String deploymentResourcePattern;
 
+    @Value("${camunda.bpm.job-executor-activate:true}")
+    private boolean jobExecutorActivate;
+
     @Bean
     public ProcessEngine processEngine() {
         StandaloneProcessEngineConfiguration configuration =
@@ -45,7 +48,7 @@ public class CamundaEngineConfig {
         );
 
         configuration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
-        configuration.setJobExecutorActivate(true);
+        configuration.setJobExecutorActivate(jobExecutorActivate);
 
         configuration.setBeans(camundaBeans());
 

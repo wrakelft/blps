@@ -37,6 +37,15 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(
+                                "/camunda/**",
+                                "/engine-rest/**",
+
+                                "/api/admin/**",
+                                "/api/cockpit/**",
+                                "/api/tasklist/**",
+                                "/api/engine/**"
+                        ).permitAll()
 
                         .requestMatchers(
                                 "/swagger-ui/**",

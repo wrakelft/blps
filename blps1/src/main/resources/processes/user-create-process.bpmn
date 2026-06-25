@@ -1,37 +1,60 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions
-        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-        id="Definitions_user_create_process"
-        targetNamespace="http://itmo.ru/blps/camunda">
-
-    <bpmn:process id="user-create-process"
-                  name="User create process"
-                  isExecutable="true"
-                  camunda:historyTimeToLive="30">
-
-        <bpmn:startEvent id="StartEvent_CreateUser" name="Create user requested">
-            <bpmn:outgoing>Flow_Start_To_CreateUser</bpmn:outgoing>
-        </bpmn:startEvent>
-
-        <bpmn:serviceTask id="ServiceTask_CreateUser"
-                          name="Validate and create user"
-                          camunda:delegateExpression="${createUserDelegate}">
-            <bpmn:incoming>Flow_Start_To_CreateUser</bpmn:incoming>
-            <bpmn:outgoing>Flow_CreateUser_To_End</bpmn:outgoing>
-        </bpmn:serviceTask>
-
-        <bpmn:endEvent id="EndEvent_UserCreated" name="User created">
-            <bpmn:incoming>Flow_CreateUser_To_End</bpmn:incoming>
-        </bpmn:endEvent>
-
-        <bpmn:sequenceFlow id="Flow_Start_To_CreateUser"
-                           sourceRef="StartEvent_CreateUser"
-                           targetRef="ServiceTask_CreateUser"/>
-
-        <bpmn:sequenceFlow id="Flow_CreateUser_To_End"
-                           sourceRef="ServiceTask_CreateUser"
-                           targetRef="EndEvent_UserCreated"/>
-
-    </bpmn:process>
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_user_create_process" targetNamespace="http://itmo.ru/blps/camunda">
+  <bpmn:process id="user-create-process" name="User create process" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="StartEvent_CreateUser" name="Create user requested" camunda:initiator="processStarter">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="username" label="Username" type="string" />
+          <camunda:formField id="email" label="Email" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_Start_To_Confirm</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="UserTask_ConfirmUserCreation" name="Confirm user creation" camunda:assignee="${processStarter}">
+      <bpmn:incoming>Flow_Start_To_Confirm</bpmn:incoming>
+      <bpmn:outgoing>Flow_Confirm_To_CreateUser</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ServiceTask_CreateUser" name="Validate and create user" camunda:delegateExpression="${createUserDelegate}">
+      <bpmn:incoming>Flow_Confirm_To_CreateUser</bpmn:incoming>
+      <bpmn:outgoing>Flow_CreateUser_To_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_UserCreated" name="User created">
+      <bpmn:incoming>Flow_CreateUser_To_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_To_Confirm" sourceRef="StartEvent_CreateUser" targetRef="UserTask_ConfirmUserCreation" />
+    <bpmn:sequenceFlow id="Flow_Confirm_To_CreateUser" sourceRef="UserTask_ConfirmUserCreation" targetRef="ServiceTask_CreateUser" />
+    <bpmn:sequenceFlow id="Flow_CreateUser_To_End" sourceRef="ServiceTask_CreateUser" targetRef="EndEvent_UserCreated" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_user_create_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_user_create_process" bpmnElement="user-create-process">
+      <bpmndi:BPMNShape id="StartEvent_CreateUser_di" bpmnElement="StartEvent_CreateUser">
+        <dc:Bounds x="140" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_ConfirmUserCreation_di" bpmnElement="UserTask_ConfirmUserCreation">
+        <dc:Bounds x="350" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_CreateUser_di" bpmnElement="ServiceTask_CreateUser">
+        <dc:Bounds x="560" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_UserCreated_di" bpmnElement="EndEvent_UserCreated">
+        <dc:Bounds x="770" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_To_Confirm_di" bpmnElement="Flow_Start_To_Confirm">
+        <di:waypoint x="176" y="148" />
+        <di:waypoint x="263" y="148" />
+        <di:waypoint x="263" y="170" />
+        <di:waypoint x="350" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Confirm_To_CreateUser_di" bpmnElement="Flow_Confirm_To_CreateUser">
+        <di:waypoint x="500" y="170" />
+        <di:waypoint x="560" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreateUser_To_End_di" bpmnElement="Flow_CreateUser_To_End">
+        <di:waypoint x="710" y="170" />
+        <di:waypoint x="740" y="170" />
+        <di:waypoint x="740" y="148" />
+        <di:waypoint x="770" y="148" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </bpmn:definitions>

@@ -7,7 +7,7 @@ import ru.itmo.blps1.entity.enums.OutboxEventStatus;
 import ru.itmo.blps1.messaging.event.BoardModerationRequestEvent;
 import ru.itmo.blps1.messaging.event.OutboxEventTypes;
 import ru.itmo.blps1.repository.OutboxEventRepository;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor

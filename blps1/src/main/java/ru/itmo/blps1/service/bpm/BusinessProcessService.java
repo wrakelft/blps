@@ -103,8 +103,7 @@ public class BusinessProcessService {
     public void correlateBoardModerationRequested(BoardModerationRequestEvent event) {
         runtimeService
                 .createMessageCorrelation(BOARD_MODERATION_MESSAGE)
-                .processInstanceBusinessKey("board-" + event.boardId())
-                .setVariable("boardId", event.boardId())
+                .processInstanceVariableEquals("boardId", event.boardId())
                 .setVariable("requestedByUserId", event.requestedByUserId())
                 .setVariable("requestedByUsername", event.requestedByUsername())
                 .setVariable("requestedAt", event.requestedAt().toString())

@@ -19,6 +19,8 @@ import ru.itmo.blps1.repository.BoardRepository;
 import ru.itmo.blps1.security.AccessControlService;
 import ru.itmo.blps1.security.CurrentUserService;
 import ru.itmo.blps1.service.outbox.OutboxEventServiceInt;
+import ru.itmo.blps1.exception.ForbiddenException;
+import ru.itmo.blps1.security.CamundaCurrentUserService;
 
 import java.time.OffsetDateTime;
 
@@ -30,6 +32,7 @@ public class BoardModerationProcessActionService {
     private final BoardModerationRequestRepository boardModerationRequestRepository;
     private final AccessControlService accessControlService;
     private final CurrentUserService currentUserService;
+    private final CamundaCurrentUserService camundaCurrentUserService;
     private final OutboxEventServiceInt outboxEventService;
     private final CorporateModerationConnector corporateModerationConnector;
 
@@ -37,7 +40,9 @@ public class BoardModerationProcessActionService {
     public SubmissionData validateSubmission(Long boardId) {
         Board board = getBoard(boardId);
 
-        accessControlService.checkCanManageBoard(board);
+        User requester = resolveRequesterForProcess();
+
+        accessControlService.checkCanManageBoard(board, requester);
 
         BoardModerationStatus currentStatus = board.getModerationStatus();
 
@@ -49,12 +54,10 @@ public class BoardModerationProcessActionService {
             throw new BadRequestException("Approved board cannot be submitted for moderation again");
         }
 
-        User currentUser = currentUserService.getCurrentUserEntity();
-
         return new SubmissionData(
                 board.getId(),
-                currentUser.getId(),
-                currentUser.getUsername(),
+                requester.getId(),
+                requester.getUsername(),
                 OffsetDateTime.now()
         );
     }
@@ -145,7 +148,7 @@ public class BoardModerationProcessActionService {
             throw new BadRequestException("Rejected moderation request cannot be approved");
         }
 
-        User currentAdmin = currentUserService.getCurrentUserEntity();
+        User currentAdmin = resolveModeratorForProcess();
 
         request.setStatus(ModerationRequestStatus.APPROVED);
         request.setModerator(currentAdmin);
@@ -180,7 +183,7 @@ public class BoardModerationProcessActionService {
             throw new BadRequestException("Reject comment is required");
         }
 
-        User currentAdmin = currentUserService.getCurrentUserEntity();
+        User currentAdmin = resolveModeratorForProcess();
 
         request.setStatus(ModerationRequestStatus.REJECTED);
         request.setModerator(currentAdmin);
@@ -221,6 +224,28 @@ public class BoardModerationProcessActionService {
                     )
             );
         }
+    }
+
+    private User resolveRequesterForProcess() {
+        return camundaCurrentUserService.getCurrentCamundaUsernameOptional()
+                .map(currentUserService::getUserEntityByUsername)
+                .orElseGet(currentUserService::getCurrentUserEntity);
+    }
+
+    private User resolveModeratorForProcess() {
+        if (camundaCurrentUserService.getCurrentCamundaUsernameOptional().isPresent()) {
+            if (!camundaCurrentUserService.isCurrentCamundaUserInGroup("moderators")) {
+                throw new ForbiddenException("Only moderators can make moderation decisions");
+            }
+
+            return camundaCurrentUserService.getCurrentCamundaUserEntity();
+        }
+
+        if (!currentUserService.isAdmin()) {
+            throw new ForbiddenException("Only admins can make moderation decisions");
+        }
+
+        return currentUserService.getCurrentUserEntity();
     }
 
     private BoardModerationRequest getModerationRequest(Long requestId) {

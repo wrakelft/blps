@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_board_pin_attach_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="board-pin-attach-process"
+                  name="Board pin attach process"
+                  isExecutable="true"
+                  camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_AttachPin" name="Attach pin to board requested">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="boardId"
+                                       label="Board ID"
+                                       type="long"/>
+                    <camunda:formField id="pinId"
+                                       label="Pin ID"
+                                       type="long"/>
+                </camunda:formData>
+            </bpmn:extensionElements>
+            <bpmn:outgoing>Flow_Start_To_AttachPin</bpmn:outgoing>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask id="ServiceTask_AttachPin"
+                          name="Check access and attach pin to board"
+                          camunda:delegateExpression="${attachPinToBoardDelegate}">
+            <bpmn:incoming>Flow_Start_To_AttachPin</bpmn:incoming>
+            <bpmn:outgoing>Flow_AttachPin_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_PinAttached" name="Pin attached">
+            <bpmn:incoming>Flow_AttachPin_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow id="Flow_Start_To_AttachPin"
+                           sourceRef="StartEvent_AttachPin"
+                           targetRef="ServiceTask_AttachPin"/>
+
+        <bpmn:sequenceFlow id="Flow_AttachPin_To_End"
+                           sourceRef="ServiceTask_AttachPin"
+                           targetRef="EndEvent_PinAttached"/>
+
+    </bpmn:process>
+</bpmn:definitions>

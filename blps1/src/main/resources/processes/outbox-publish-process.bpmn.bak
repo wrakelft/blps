@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_outbox_publish_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="outbox-publish-process"
+                  name="Outbox publish process"
+                  isExecutable="true"
+                  camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_OutboxTimer" name="Outbox timer">
+            <bpmn:outgoing>Flow_Start_To_PublishOutbox</bpmn:outgoing>
+            <bpmn:timerEventDefinition>
+                <bpmn:timeCycle>R/PT5S</bpmn:timeCycle>
+            </bpmn:timerEventDefinition>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask id="ServiceTask_PublishOutbox"
+                          name="Publish outbox events"
+                          camunda:delegateExpression="${publishOutboxEventsDelegate}">
+            <bpmn:incoming>Flow_Start_To_PublishOutbox</bpmn:incoming>
+            <bpmn:outgoing>Flow_PublishOutbox_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_OutboxPublished" name="Outbox published">
+            <bpmn:incoming>Flow_PublishOutbox_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow id="Flow_Start_To_PublishOutbox"
+                           sourceRef="StartEvent_OutboxTimer"
+                           targetRef="ServiceTask_PublishOutbox"/>
+
+        <bpmn:sequenceFlow id="Flow_PublishOutbox_To_End"
+                           sourceRef="ServiceTask_PublishOutbox"
+                           targetRef="EndEvent_OutboxPublished"/>
+
+    </bpmn:process>
+</bpmn:definitions>

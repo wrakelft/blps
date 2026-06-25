@@ -1,40 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions
-        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-        id="Definitions_outbox_publish_process"
-        targetNamespace="http://itmo.ru/blps/camunda">
-
-    <bpmn:process id="outbox-publish-process"
-                  name="Outbox publish process"
-                  isExecutable="true"
-                  camunda:historyTimeToLive="30">
-
-        <bpmn:startEvent id="StartEvent_OutboxTimer" name="Outbox timer">
-            <bpmn:outgoing>Flow_Start_To_PublishOutbox</bpmn:outgoing>
-            <bpmn:timerEventDefinition>
-                <bpmn:timeCycle>R/PT5S</bpmn:timeCycle>
-            </bpmn:timerEventDefinition>
-        </bpmn:startEvent>
-
-        <bpmn:serviceTask id="ServiceTask_PublishOutbox"
-                          name="Publish outbox events"
-                          camunda:delegateExpression="${publishOutboxEventsDelegate}">
-            <bpmn:incoming>Flow_Start_To_PublishOutbox</bpmn:incoming>
-            <bpmn:outgoing>Flow_PublishOutbox_To_End</bpmn:outgoing>
-        </bpmn:serviceTask>
-
-        <bpmn:endEvent id="EndEvent_OutboxPublished" name="Outbox published">
-            <bpmn:incoming>Flow_PublishOutbox_To_End</bpmn:incoming>
-        </bpmn:endEvent>
-
-        <bpmn:sequenceFlow id="Flow_Start_To_PublishOutbox"
-                           sourceRef="StartEvent_OutboxTimer"
-                           targetRef="ServiceTask_PublishOutbox"/>
-
-        <bpmn:sequenceFlow id="Flow_PublishOutbox_To_End"
-                           sourceRef="ServiceTask_PublishOutbox"
-                           targetRef="EndEvent_OutboxPublished"/>
-
-    </bpmn:process>
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_outbox_publish_process" targetNamespace="http://itmo.ru/blps/camunda">
+  <bpmn:process id="outbox-publish-process" name="Outbox publish process" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="StartEvent_OutboxTimer" name="Outbox timer">
+      <bpmn:outgoing>Flow_Start_To_PublishOutbox</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeCycle>R/PT5S</bpmn:timeCycle>
+      </bpmn:timerEventDefinition>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="ServiceTask_PublishOutbox" name="Publish outbox events" camunda:delegateExpression="${publishOutboxEventsDelegate}">
+      <bpmn:incoming>Flow_Start_To_PublishOutbox</bpmn:incoming>
+      <bpmn:outgoing>Flow_PublishOutbox_To_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_OutboxPublished" name="Outbox published">
+      <bpmn:incoming>Flow_PublishOutbox_To_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_To_PublishOutbox" sourceRef="StartEvent_OutboxTimer" targetRef="ServiceTask_PublishOutbox" />
+    <bpmn:sequenceFlow id="Flow_PublishOutbox_To_End" sourceRef="ServiceTask_PublishOutbox" targetRef="EndEvent_OutboxPublished" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_outbox_publish_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_outbox_publish_process" bpmnElement="outbox-publish-process">
+      <bpmndi:BPMNShape id="StartEvent_OutboxTimer_di" bpmnElement="StartEvent_OutboxTimer">
+        <dc:Bounds x="140" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_PublishOutbox_di" bpmnElement="ServiceTask_PublishOutbox">
+        <dc:Bounds x="350" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_OutboxPublished_di" bpmnElement="EndEvent_OutboxPublished">
+        <dc:Bounds x="560" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_To_PublishOutbox_di" bpmnElement="Flow_Start_To_PublishOutbox">
+        <di:waypoint x="176" y="148" />
+        <di:waypoint x="263" y="148" />
+        <di:waypoint x="263" y="170" />
+        <di:waypoint x="350" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PublishOutbox_To_End_di" bpmnElement="Flow_PublishOutbox_To_End">
+        <di:waypoint x="500" y="170" />
+        <di:waypoint x="530" y="170" />
+        <di:waypoint x="530" y="148" />
+        <di:waypoint x="560" y="148" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </bpmn:definitions>

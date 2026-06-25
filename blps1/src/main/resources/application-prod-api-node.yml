@@ -1,0 +1,18 @@
+camunda:
+  bpm:
+    job-executor-activate: false
+
+app:
+  kafka:
+    consumer-enabled: false
+
+  outbox:
+    publisher-enabled: false
+
+  bitrix24:
+    retry-enabled: false
+
+logging:
+  level:
+    ru.itmo.blps1.messaging: WARN
+    ru.itmo.blps1.bpm.delegate.scheduler: WARN

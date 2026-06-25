@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_board_privacy_update_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="board-privacy-update-process"
+                  name="Board privacy update process"
+                  isExecutable="true"
+                  camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_UpdatePrivacy" name="Update board privacy requested">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="boardId"
+                                       label="Board ID"
+                                       type="long"/>
+
+                    <camunda:formField id="boardPrivacy"
+                                       label="New privacy"
+                                       type="enum"
+                                       defaultValue="PUBLIC">
+                        <camunda:value id="PUBLIC" name="Public"/>
+                        <camunda:value id="PRIVATE" name="Private"/>
+                    </camunda:formField>
+                </camunda:formData>
+            </bpmn:extensionElements>
+
+            <bpmn:outgoing>Flow_Start_To_UpdatePrivacy</bpmn:outgoing>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask id="ServiceTask_UpdatePrivacy"
+                          name="Check access and update privacy"
+                          camunda:delegateExpression="${updateBoardPrivacyDelegate}">
+            <bpmn:incoming>Flow_Start_To_UpdatePrivacy</bpmn:incoming>
+            <bpmn:outgoing>Flow_UpdatePrivacy_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_PrivacyUpdated" name="Privacy updated">
+            <bpmn:incoming>Flow_UpdatePrivacy_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow id="Flow_Start_To_UpdatePrivacy"
+                           sourceRef="StartEvent_UpdatePrivacy"
+                           targetRef="ServiceTask_UpdatePrivacy"/>
+
+        <bpmn:sequenceFlow id="Flow_UpdatePrivacy_To_End"
+                           sourceRef="ServiceTask_UpdatePrivacy"
+                           targetRef="EndEvent_PrivacyUpdated"/>
+
+    </bpmn:process>
+</bpmn:definitions>

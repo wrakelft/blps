@@ -1,37 +1,60 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions
-        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-        id="Definitions_auth_login_process"
-        targetNamespace="http://itmo.ru/blps/camunda">
-
-    <bpmn:process id="auth-login-process"
-                  name="Auth login process"
-                  isExecutable="true"
-                  camunda:historyTimeToLive="30">
-
-        <bpmn:startEvent id="StartEvent_Login" name="Login requested">
-            <bpmn:outgoing>Flow_Start_To_Authenticate</bpmn:outgoing>
-        </bpmn:startEvent>
-
-        <bpmn:serviceTask id="ServiceTask_Authenticate"
-                          name="Authenticate via JAAS and generate JWT"
-                          camunda:delegateExpression="${authLoginDelegate}">
-            <bpmn:incoming>Flow_Start_To_Authenticate</bpmn:incoming>
-            <bpmn:outgoing>Flow_Authenticate_To_End</bpmn:outgoing>
-        </bpmn:serviceTask>
-
-        <bpmn:endEvent id="EndEvent_LoginFinished" name="Login finished">
-            <bpmn:incoming>Flow_Authenticate_To_End</bpmn:incoming>
-        </bpmn:endEvent>
-
-        <bpmn:sequenceFlow id="Flow_Start_To_Authenticate"
-                           sourceRef="StartEvent_Login"
-                           targetRef="ServiceTask_Authenticate"/>
-
-        <bpmn:sequenceFlow id="Flow_Authenticate_To_End"
-                           sourceRef="ServiceTask_Authenticate"
-                           targetRef="EndEvent_LoginFinished"/>
-
-    </bpmn:process>
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_auth_login_process" targetNamespace="http://itmo.ru/blps/camunda">
+  <bpmn:process id="auth-login-process" name="Auth login process" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="StartEvent_Login" name="Login requested" camunda:initiator="processStarter">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="username" label="Username" type="string" />
+          <camunda:formField id="password" label="Password" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_Start_To_Confirm</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="UserTask_ConfirmLogin" name="Confirm login request" camunda:assignee="${processStarter}">
+      <bpmn:incoming>Flow_Start_To_Confirm</bpmn:incoming>
+      <bpmn:outgoing>Flow_Confirm_To_Authenticate</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ServiceTask_Authenticate" name="Authenticate via JAAS and generate JWT" camunda:delegateExpression="${authLoginDelegate}">
+      <bpmn:incoming>Flow_Confirm_To_Authenticate</bpmn:incoming>
+      <bpmn:outgoing>Flow_Authenticate_To_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_LoginFinished" name="Login finished">
+      <bpmn:incoming>Flow_Authenticate_To_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_To_Confirm" sourceRef="StartEvent_Login" targetRef="UserTask_ConfirmLogin" />
+    <bpmn:sequenceFlow id="Flow_Confirm_To_Authenticate" sourceRef="UserTask_ConfirmLogin" targetRef="ServiceTask_Authenticate" />
+    <bpmn:sequenceFlow id="Flow_Authenticate_To_End" sourceRef="ServiceTask_Authenticate" targetRef="EndEvent_LoginFinished" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_auth_login_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_auth_login_process" bpmnElement="auth-login-process">
+      <bpmndi:BPMNShape id="StartEvent_Login_di" bpmnElement="StartEvent_Login">
+        <dc:Bounds x="140" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_ConfirmLogin_di" bpmnElement="UserTask_ConfirmLogin">
+        <dc:Bounds x="350" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_Authenticate_di" bpmnElement="ServiceTask_Authenticate">
+        <dc:Bounds x="560" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_LoginFinished_di" bpmnElement="EndEvent_LoginFinished">
+        <dc:Bounds x="770" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_To_Confirm_di" bpmnElement="Flow_Start_To_Confirm">
+        <di:waypoint x="176" y="148" />
+        <di:waypoint x="263" y="148" />
+        <di:waypoint x="263" y="170" />
+        <di:waypoint x="350" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Confirm_To_Authenticate_di" bpmnElement="Flow_Confirm_To_Authenticate">
+        <di:waypoint x="500" y="170" />
+        <di:waypoint x="560" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Authenticate_To_End_di" bpmnElement="Flow_Authenticate_To_End">
+        <di:waypoint x="710" y="170" />
+        <di:waypoint x="740" y="170" />
+        <di:waypoint x="740" y="148" />
+        <di:waypoint x="770" y="148" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </bpmn:definitions>

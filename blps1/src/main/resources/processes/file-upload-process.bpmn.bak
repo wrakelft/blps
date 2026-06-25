@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_file_upload_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="file-upload-process"
+                  name="File upload process"
+                  isExecutable="true"
+                  camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_FileUpload" name="File upload requested">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="fileRef"
+                                       label="File reference"
+                                       type="string"/>
+                </camunda:formData>
+            </bpmn:extensionElements>
+            <bpmn:outgoing>Flow_Start_To_UploadFile</bpmn:outgoing>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask id="ServiceTask_UploadFile"
+                          name="Validate and upload file to MinIO"
+                          camunda:delegateExpression="${uploadFileDelegate}">
+            <bpmn:incoming>Flow_Start_To_UploadFile</bpmn:incoming>
+            <bpmn:outgoing>Flow_UploadFile_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_FileUploaded" name="File uploaded">
+            <bpmn:incoming>Flow_UploadFile_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow id="Flow_Start_To_UploadFile"
+                           sourceRef="StartEvent_FileUpload"
+                           targetRef="ServiceTask_UploadFile"/>
+
+        <bpmn:sequenceFlow id="Flow_UploadFile_To_End"
+                           sourceRef="ServiceTask_UploadFile"
+                           targetRef="EndEvent_FileUploaded"/>
+
+    </bpmn:process>
+</bpmn:definitions>

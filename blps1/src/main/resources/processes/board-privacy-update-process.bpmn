@@ -1,53 +1,63 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions
-        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-        id="Definitions_board_privacy_update_process"
-        targetNamespace="http://itmo.ru/blps/camunda">
-
-    <bpmn:process id="board-privacy-update-process"
-                  name="Board privacy update process"
-                  isExecutable="true"
-                  camunda:historyTimeToLive="30">
-
-        <bpmn:startEvent id="StartEvent_UpdatePrivacy" name="Update board privacy requested">
-            <bpmn:extensionElements>
-                <camunda:formData>
-                    <camunda:formField id="boardId"
-                                       label="Board ID"
-                                       type="long"/>
-
-                    <camunda:formField id="boardPrivacy"
-                                       label="New privacy"
-                                       type="enum"
-                                       defaultValue="PUBLIC">
-                        <camunda:value id="PUBLIC" name="Public"/>
-                        <camunda:value id="PRIVATE" name="Private"/>
-                    </camunda:formField>
-                </camunda:formData>
-            </bpmn:extensionElements>
-
-            <bpmn:outgoing>Flow_Start_To_UpdatePrivacy</bpmn:outgoing>
-        </bpmn:startEvent>
-
-        <bpmn:serviceTask id="ServiceTask_UpdatePrivacy"
-                          name="Check access and update privacy"
-                          camunda:delegateExpression="${updateBoardPrivacyDelegate}">
-            <bpmn:incoming>Flow_Start_To_UpdatePrivacy</bpmn:incoming>
-            <bpmn:outgoing>Flow_UpdatePrivacy_To_End</bpmn:outgoing>
-        </bpmn:serviceTask>
-
-        <bpmn:endEvent id="EndEvent_PrivacyUpdated" name="Privacy updated">
-            <bpmn:incoming>Flow_UpdatePrivacy_To_End</bpmn:incoming>
-        </bpmn:endEvent>
-
-        <bpmn:sequenceFlow id="Flow_Start_To_UpdatePrivacy"
-                           sourceRef="StartEvent_UpdatePrivacy"
-                           targetRef="ServiceTask_UpdatePrivacy"/>
-
-        <bpmn:sequenceFlow id="Flow_UpdatePrivacy_To_End"
-                           sourceRef="ServiceTask_UpdatePrivacy"
-                           targetRef="EndEvent_PrivacyUpdated"/>
-
-    </bpmn:process>
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_board_privacy_update_process" targetNamespace="http://itmo.ru/blps/camunda">
+  <bpmn:process id="board-privacy-update-process" name="Board privacy update process" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="StartEvent_UpdatePrivacy" name="Update board privacy requested" camunda:initiator="processStarter">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="boardId" label="Board ID" type="long" />
+          <camunda:formField id="boardPrivacy" label="New privacy" type="enum" defaultValue="PUBLIC">
+            <camunda:value id="PUBLIC" name="Public" />
+            <camunda:value id="PRIVATE" name="Private" />
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_Start_To_Confirm</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="UserTask_ConfirmPrivacyUpdate" name="Confirm privacy update" camunda:assignee="${processStarter}">
+      <bpmn:incoming>Flow_Start_To_Confirm</bpmn:incoming>
+      <bpmn:outgoing>Flow_Confirm_To_UpdatePrivacy</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ServiceTask_UpdatePrivacy" name="Check access and update privacy" camunda:delegateExpression="${updateBoardPrivacyDelegate}">
+      <bpmn:incoming>Flow_Confirm_To_UpdatePrivacy</bpmn:incoming>
+      <bpmn:outgoing>Flow_UpdatePrivacy_To_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_PrivacyUpdated" name="Privacy updated">
+      <bpmn:incoming>Flow_UpdatePrivacy_To_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_To_Confirm" sourceRef="StartEvent_UpdatePrivacy" targetRef="UserTask_ConfirmPrivacyUpdate" />
+    <bpmn:sequenceFlow id="Flow_Confirm_To_UpdatePrivacy" sourceRef="UserTask_ConfirmPrivacyUpdate" targetRef="ServiceTask_UpdatePrivacy" />
+    <bpmn:sequenceFlow id="Flow_UpdatePrivacy_To_End" sourceRef="ServiceTask_UpdatePrivacy" targetRef="EndEvent_PrivacyUpdated" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_board_privacy_update_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_board_privacy_update_process" bpmnElement="board-privacy-update-process">
+      <bpmndi:BPMNShape id="StartEvent_UpdatePrivacy_di" bpmnElement="StartEvent_UpdatePrivacy">
+        <dc:Bounds x="140" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_ConfirmPrivacyUpdate_di" bpmnElement="UserTask_ConfirmPrivacyUpdate">
+        <dc:Bounds x="350" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_UpdatePrivacy_di" bpmnElement="ServiceTask_UpdatePrivacy">
+        <dc:Bounds x="560" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_PrivacyUpdated_di" bpmnElement="EndEvent_PrivacyUpdated">
+        <dc:Bounds x="770" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_To_Confirm_di" bpmnElement="Flow_Start_To_Confirm">
+        <di:waypoint x="176" y="148" />
+        <di:waypoint x="263" y="148" />
+        <di:waypoint x="263" y="170" />
+        <di:waypoint x="350" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Confirm_To_UpdatePrivacy_di" bpmnElement="Flow_Confirm_To_UpdatePrivacy">
+        <di:waypoint x="500" y="170" />
+        <di:waypoint x="560" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_UpdatePrivacy_To_End_di" bpmnElement="Flow_UpdatePrivacy_To_End">
+        <di:waypoint x="710" y="170" />
+        <di:waypoint x="740" y="170" />
+        <di:waypoint x="740" y="148" />
+        <di:waypoint x="770" y="148" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </bpmn:definitions>

@@ -18,33 +18,16 @@ public class CreateBoardDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) {
         CreateBoardRequest request = new CreateBoardRequest();
+
         request.setName((String) execution.getVariable("boardName"));
         request.setDescription((String) execution.getVariable("boardDescription"));
         request.setPrivacy(BoardPrivacy.valueOf((String) execution.getVariable("boardPrivacy")));
-        request.setOwnerId(toLong(execution.getVariable("ownerId")));
 
         BoardResponse response = boardService.createBoard(request);
 
         execution.setVariable("boardId", response.getId());
-    }
-
-    private Long toLong(Object value) {
-        if (value == null) {
-            return null;
-        }
-
-        if (value instanceof Long longValue) {
-            return longValue;
-        }
-
-        if (value instanceof Integer integerValue) {
-            return integerValue.longValue();
-        }
-
-        if (value instanceof Number numberValue) {
-            return numberValue.longValue();
-        }
-
-        return Long.valueOf(value.toString());
+        execution.setVariable("createdBoardId", response.getId());
+        execution.setVariable("createdBoardName", response.getName());
+        execution.setVariable("createdBoardPrivacy", response.getPrivacy().toString());
     }
 }

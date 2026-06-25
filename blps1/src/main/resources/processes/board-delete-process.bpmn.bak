@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+        id="Definitions_board_delete_process"
+        targetNamespace="http://itmo.ru/blps/camunda">
+
+    <bpmn:process id="board-delete-process"
+                  name="Board delete process"
+                  isExecutable="true"
+                  camunda:historyTimeToLive="30">
+
+        <bpmn:startEvent id="StartEvent_DeleteBoard" name="Delete board requested">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="boardId"
+                                       label="Board ID"
+                                       type="long"/>
+                </camunda:formData>
+            </bpmn:extensionElements>
+            <bpmn:outgoing>Flow_Start_To_DeleteBoard</bpmn:outgoing>
+        </bpmn:startEvent>
+
+        <bpmn:serviceTask id="ServiceTask_DeleteBoard"
+                          name="Check access and delete board"
+                          camunda:delegateExpression="${deleteBoardDelegate}">
+            <bpmn:incoming>Flow_Start_To_DeleteBoard</bpmn:incoming>
+            <bpmn:outgoing>Flow_DeleteBoard_To_End</bpmn:outgoing>
+        </bpmn:serviceTask>
+
+        <bpmn:endEvent id="EndEvent_BoardDeleted" name="Board deleted">
+            <bpmn:incoming>Flow_DeleteBoard_To_End</bpmn:incoming>
+        </bpmn:endEvent>
+
+        <bpmn:sequenceFlow id="Flow_Start_To_DeleteBoard"
+                           sourceRef="StartEvent_DeleteBoard"
+                           targetRef="ServiceTask_DeleteBoard"/>
+
+        <bpmn:sequenceFlow id="Flow_DeleteBoard_To_End"
+                           sourceRef="ServiceTask_DeleteBoard"
+                           targetRef="EndEvent_BoardDeleted"/>
+
+    </bpmn:process>
+</bpmn:definitions>

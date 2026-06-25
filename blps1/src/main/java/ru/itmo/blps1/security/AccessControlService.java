@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.itmo.blps1.entity.Board;
 import ru.itmo.blps1.entity.Pin;
+import ru.itmo.blps1.entity.User;
 import ru.itmo.blps1.entity.enums.BoardModerationStatus;
 import ru.itmo.blps1.entity.enums.BoardPrivacy;
 import ru.itmo.blps1.exception.ForbiddenException;
@@ -17,13 +18,20 @@ public class AccessControlService {
     private final CurrentUserService currentUserService;
 
     public void checkCanManageBoard(Board board) {
-        if (currentUserService.isAdmin()) {
-            return;
+        checkCanManageBoard(board, currentUserService.getCurrentUserEntity());
+    }
+
+    public void checkCanManageBoard(Board board, User user) {
+        if (user == null) {
+            throw new ForbiddenException("User is not authenticated");
         }
 
-        String currentUsername = currentUserService.getCurrentUsername();
+        boolean isAdmin = "admin".equals(user.getUsername());
 
-        if (board.getOwner() == null || !currentUsername.equals(board.getOwner().getUsername())) {
+        boolean isOwner = board.getOwner() != null
+                && user.getUsername().equals(board.getOwner().getUsername());
+
+        if (!isAdmin && !isOwner) {
             throw new ForbiddenException("You can manage only your own boards");
         }
     }

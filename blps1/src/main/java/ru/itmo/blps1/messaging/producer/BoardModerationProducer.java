@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import ru.itmo.blps1.messaging.event.BoardModerationRequestEvent;
-import tools.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor

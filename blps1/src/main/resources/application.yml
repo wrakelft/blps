@@ -82,10 +82,10 @@ bitrix24:
 
 app:
   outbox:
-    publisher-enabled: false
+    publisher-enabled: true
     publish-delay-ms: 5000
   bitrix24:
-    retry-enabled: false
+    retry-enabled: true
     retry-delay-ms: 30000
   kafka:
     consumer-enabled: true
@@ -94,6 +94,29 @@ app:
 
 camunda:
   bpm:
-    database-schema-update: true
+    database:
+      schema-update: true
+
     history-level: full
-    deployment-resource-pattern: classpath*:/processes/*.bpmn
+
+    job-execution:
+      enabled: true
+
+    deployment-resource-pattern:
+      - classpath*:/processes/*.bpmn
+      - classpath*:/forms/*.form
+
+    webapp:
+      application-path: /camunda
+
+    admin-user:
+      id: admin
+      password: admin
+      firstName: Admin
+      lastName: BLPS
+
+    filter:
+      create: All tasks
+
+    authorization:
+      enabled: true

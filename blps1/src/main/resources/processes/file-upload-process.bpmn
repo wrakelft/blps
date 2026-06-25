@@ -1,37 +1,59 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions
-        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-        id="Definitions_file_upload_process"
-        targetNamespace="http://itmo.ru/blps/camunda">
-
-    <bpmn:process id="file-upload-process"
-                  name="File upload process"
-                  isExecutable="true"
-                  camunda:historyTimeToLive="30">
-
-        <bpmn:startEvent id="StartEvent_FileUpload" name="File upload requested">
-            <bpmn:outgoing>Flow_Start_To_UploadFile</bpmn:outgoing>
-        </bpmn:startEvent>
-
-        <bpmn:serviceTask id="ServiceTask_UploadFile"
-                          name="Validate and upload file to MinIO"
-                          camunda:delegateExpression="${uploadFileDelegate}">
-            <bpmn:incoming>Flow_Start_To_UploadFile</bpmn:incoming>
-            <bpmn:outgoing>Flow_UploadFile_To_End</bpmn:outgoing>
-        </bpmn:serviceTask>
-
-        <bpmn:endEvent id="EndEvent_FileUploaded" name="File uploaded">
-            <bpmn:incoming>Flow_UploadFile_To_End</bpmn:incoming>
-        </bpmn:endEvent>
-
-        <bpmn:sequenceFlow id="Flow_Start_To_UploadFile"
-                           sourceRef="StartEvent_FileUpload"
-                           targetRef="ServiceTask_UploadFile"/>
-
-        <bpmn:sequenceFlow id="Flow_UploadFile_To_End"
-                           sourceRef="ServiceTask_UploadFile"
-                           targetRef="EndEvent_FileUploaded"/>
-
-    </bpmn:process>
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_file_upload_process" targetNamespace="http://itmo.ru/blps/camunda">
+  <bpmn:process id="file-upload-process" name="File upload process" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="StartEvent_FileUpload" name="File upload requested" camunda:initiator="processStarter">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="fileRef" label="File reference" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_Start_To_Confirm</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="UserTask_ConfirmFileUpload" name="Confirm file upload" camunda:assignee="${processStarter}">
+      <bpmn:incoming>Flow_Start_To_Confirm</bpmn:incoming>
+      <bpmn:outgoing>Flow_Confirm_To_UploadFile</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ServiceTask_UploadFile" name="Validate and upload file to MinIO" camunda:delegateExpression="${uploadFileDelegate}">
+      <bpmn:incoming>Flow_Confirm_To_UploadFile</bpmn:incoming>
+      <bpmn:outgoing>Flow_UploadFile_To_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_FileUploaded" name="File uploaded">
+      <bpmn:incoming>Flow_UploadFile_To_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_To_Confirm" sourceRef="StartEvent_FileUpload" targetRef="UserTask_ConfirmFileUpload" />
+    <bpmn:sequenceFlow id="Flow_Confirm_To_UploadFile" sourceRef="UserTask_ConfirmFileUpload" targetRef="ServiceTask_UploadFile" />
+    <bpmn:sequenceFlow id="Flow_UploadFile_To_End" sourceRef="ServiceTask_UploadFile" targetRef="EndEvent_FileUploaded" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_file_upload_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_file_upload_process" bpmnElement="file-upload-process">
+      <bpmndi:BPMNShape id="StartEvent_FileUpload_di" bpmnElement="StartEvent_FileUpload">
+        <dc:Bounds x="140" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_ConfirmFileUpload_di" bpmnElement="UserTask_ConfirmFileUpload">
+        <dc:Bounds x="350" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_UploadFile_di" bpmnElement="ServiceTask_UploadFile">
+        <dc:Bounds x="560" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_FileUploaded_di" bpmnElement="EndEvent_FileUploaded">
+        <dc:Bounds x="770" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_To_Confirm_di" bpmnElement="Flow_Start_To_Confirm">
+        <di:waypoint x="176" y="148" />
+        <di:waypoint x="263" y="148" />
+        <di:waypoint x="263" y="170" />
+        <di:waypoint x="350" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Confirm_To_UploadFile_di" bpmnElement="Flow_Confirm_To_UploadFile">
+        <di:waypoint x="500" y="170" />
+        <di:waypoint x="560" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_UploadFile_To_End_di" bpmnElement="Flow_UploadFile_To_End">
+        <di:waypoint x="710" y="170" />
+        <di:waypoint x="740" y="170" />
+        <di:waypoint x="740" y="148" />
+        <di:waypoint x="770" y="148" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </bpmn:definitions>

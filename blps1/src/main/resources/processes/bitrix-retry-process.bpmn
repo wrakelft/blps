@@ -1,40 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions
-        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-        id="Definitions_bitrix_retry_process"
-        targetNamespace="http://itmo.ru/blps/camunda">
-
-    <bpmn:process id="bitrix-retry-process"
-                  name="Bitrix retry process"
-                  isExecutable="true"
-                  camunda:historyTimeToLive="30">
-
-        <bpmn:startEvent id="StartEvent_BitrixRetryTimer" name="Bitrix retry timer">
-            <bpmn:outgoing>Flow_Start_To_RetryBitrix</bpmn:outgoing>
-            <bpmn:timerEventDefinition>
-                <bpmn:timeCycle>R/PT30S</bpmn:timeCycle>
-            </bpmn:timerEventDefinition>
-        </bpmn:startEvent>
-
-        <bpmn:serviceTask id="ServiceTask_RetryBitrix"
-                          name="Retry failed Bitrix sync"
-                          camunda:delegateExpression="${retryFailedBitrixSyncDelegate}">
-            <bpmn:incoming>Flow_Start_To_RetryBitrix</bpmn:incoming>
-            <bpmn:outgoing>Flow_RetryBitrix_To_End</bpmn:outgoing>
-        </bpmn:serviceTask>
-
-        <bpmn:endEvent id="EndEvent_BitrixRetryFinished" name="Bitrix retry finished">
-            <bpmn:incoming>Flow_RetryBitrix_To_End</bpmn:incoming>
-        </bpmn:endEvent>
-
-        <bpmn:sequenceFlow id="Flow_Start_To_RetryBitrix"
-                           sourceRef="StartEvent_BitrixRetryTimer"
-                           targetRef="ServiceTask_RetryBitrix"/>
-
-        <bpmn:sequenceFlow id="Flow_RetryBitrix_To_End"
-                           sourceRef="ServiceTask_RetryBitrix"
-                           targetRef="EndEvent_BitrixRetryFinished"/>
-
-    </bpmn:process>
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_bitrix_retry_process" targetNamespace="http://itmo.ru/blps/camunda">
+  <bpmn:process id="bitrix-retry-process" name="Bitrix retry process" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="StartEvent_BitrixRetryTimer" name="Bitrix retry timer">
+      <bpmn:outgoing>Flow_Start_To_RetryBitrix</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeCycle>R/PT30S</bpmn:timeCycle>
+      </bpmn:timerEventDefinition>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="ServiceTask_RetryBitrix" name="Retry failed Bitrix sync" camunda:delegateExpression="${retryFailedBitrixSyncDelegate}">
+      <bpmn:incoming>Flow_Start_To_RetryBitrix</bpmn:incoming>
+      <bpmn:outgoing>Flow_RetryBitrix_To_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_BitrixRetryFinished" name="Bitrix retry finished">
+      <bpmn:incoming>Flow_RetryBitrix_To_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_To_RetryBitrix" sourceRef="StartEvent_BitrixRetryTimer" targetRef="ServiceTask_RetryBitrix" />
+    <bpmn:sequenceFlow id="Flow_RetryBitrix_To_End" sourceRef="ServiceTask_RetryBitrix" targetRef="EndEvent_BitrixRetryFinished" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_bitrix_retry_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_bitrix_retry_process" bpmnElement="bitrix-retry-process">
+      <bpmndi:BPMNShape id="StartEvent_BitrixRetryTimer_di" bpmnElement="StartEvent_BitrixRetryTimer">
+        <dc:Bounds x="140" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_RetryBitrix_di" bpmnElement="ServiceTask_RetryBitrix">
+        <dc:Bounds x="350" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_BitrixRetryFinished_di" bpmnElement="EndEvent_BitrixRetryFinished">
+        <dc:Bounds x="560" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_To_RetryBitrix_di" bpmnElement="Flow_Start_To_RetryBitrix">
+        <di:waypoint x="176" y="148" />
+        <di:waypoint x="263" y="148" />
+        <di:waypoint x="263" y="170" />
+        <di:waypoint x="350" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RetryBitrix_To_End_di" bpmnElement="Flow_RetryBitrix_To_End">
+        <di:waypoint x="500" y="170" />
+        <di:waypoint x="530" y="170" />
+        <di:waypoint x="530" y="148" />
+        <di:waypoint x="560" y="148" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </bpmn:definitions>

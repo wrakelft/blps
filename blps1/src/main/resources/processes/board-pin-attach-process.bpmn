@@ -1,37 +1,60 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions
-        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-        id="Definitions_board_pin_attach_process"
-        targetNamespace="http://itmo.ru/blps/camunda">
-
-    <bpmn:process id="board-pin-attach-process"
-                  name="Board pin attach process"
-                  isExecutable="true"
-                  camunda:historyTimeToLive="30">
-
-        <bpmn:startEvent id="StartEvent_AttachPin" name="Attach pin to board requested">
-            <bpmn:outgoing>Flow_Start_To_AttachPin</bpmn:outgoing>
-        </bpmn:startEvent>
-
-        <bpmn:serviceTask id="ServiceTask_AttachPin"
-                          name="Check access and attach pin to board"
-                          camunda:delegateExpression="${attachPinToBoardDelegate}">
-            <bpmn:incoming>Flow_Start_To_AttachPin</bpmn:incoming>
-            <bpmn:outgoing>Flow_AttachPin_To_End</bpmn:outgoing>
-        </bpmn:serviceTask>
-
-        <bpmn:endEvent id="EndEvent_PinAttached" name="Pin attached">
-            <bpmn:incoming>Flow_AttachPin_To_End</bpmn:incoming>
-        </bpmn:endEvent>
-
-        <bpmn:sequenceFlow id="Flow_Start_To_AttachPin"
-                           sourceRef="StartEvent_AttachPin"
-                           targetRef="ServiceTask_AttachPin"/>
-
-        <bpmn:sequenceFlow id="Flow_AttachPin_To_End"
-                           sourceRef="ServiceTask_AttachPin"
-                           targetRef="EndEvent_PinAttached"/>
-
-    </bpmn:process>
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_board_pin_attach_process" targetNamespace="http://itmo.ru/blps/camunda">
+  <bpmn:process id="board-pin-attach-process" name="Board pin attach process" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="StartEvent_AttachPin" name="Attach pin to board requested" camunda:initiator="processStarter">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="boardId" label="Board ID" type="long" />
+          <camunda:formField id="pinId" label="Pin ID" type="long" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_Start_To_Confirm</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="UserTask_ConfirmPinAttach" name="Confirm pin attaching" camunda:assignee="${processStarter}">
+      <bpmn:incoming>Flow_Start_To_Confirm</bpmn:incoming>
+      <bpmn:outgoing>Flow_Confirm_To_AttachPin</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ServiceTask_AttachPin" name="Check access and attach pin to board" camunda:delegateExpression="${attachPinToBoardDelegate}">
+      <bpmn:incoming>Flow_Confirm_To_AttachPin</bpmn:incoming>
+      <bpmn:outgoing>Flow_AttachPin_To_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_PinAttached" name="Pin attached">
+      <bpmn:incoming>Flow_AttachPin_To_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_To_Confirm" sourceRef="StartEvent_AttachPin" targetRef="UserTask_ConfirmPinAttach" />
+    <bpmn:sequenceFlow id="Flow_Confirm_To_AttachPin" sourceRef="UserTask_ConfirmPinAttach" targetRef="ServiceTask_AttachPin" />
+    <bpmn:sequenceFlow id="Flow_AttachPin_To_End" sourceRef="ServiceTask_AttachPin" targetRef="EndEvent_PinAttached" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_board_pin_attach_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_board_pin_attach_process" bpmnElement="board-pin-attach-process">
+      <bpmndi:BPMNShape id="StartEvent_AttachPin_di" bpmnElement="StartEvent_AttachPin">
+        <dc:Bounds x="140" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_ConfirmPinAttach_di" bpmnElement="UserTask_ConfirmPinAttach">
+        <dc:Bounds x="350" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_AttachPin_di" bpmnElement="ServiceTask_AttachPin">
+        <dc:Bounds x="560" y="130" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_PinAttached_di" bpmnElement="EndEvent_PinAttached">
+        <dc:Bounds x="770" y="130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_To_Confirm_di" bpmnElement="Flow_Start_To_Confirm">
+        <di:waypoint x="176" y="148" />
+        <di:waypoint x="263" y="148" />
+        <di:waypoint x="263" y="170" />
+        <di:waypoint x="350" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Confirm_To_AttachPin_di" bpmnElement="Flow_Confirm_To_AttachPin">
+        <di:waypoint x="500" y="170" />
+        <di:waypoint x="560" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AttachPin_To_End_di" bpmnElement="Flow_AttachPin_To_End">
+        <di:waypoint x="710" y="170" />
+        <di:waypoint x="740" y="170" />
+        <di:waypoint x="740" y="148" />
+        <di:waypoint x="770" y="148" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </bpmn:definitions>
