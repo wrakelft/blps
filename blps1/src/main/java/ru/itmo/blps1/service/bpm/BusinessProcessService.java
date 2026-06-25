@@ -1,8 +1,16 @@
 package ru.itmo.blps1.service.bpm;
 
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.form.FormField;
+import org.camunda.bpm.engine.form.StartFormData;
+import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.form.type.EnumFormType;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.stereotype.Service;
@@ -14,9 +22,7 @@ import ru.itmo.blps1.dto.board.CreateBoardRequest;
 import ru.itmo.blps1.dto.board.UpdateBoardPrivacyRequest;
 import ru.itmo.blps1.dto.boardpin.BoardPinResponse;
 import ru.itmo.blps1.dto.boardpin.CreatePinInBoardResponse;
-import ru.itmo.blps1.dto.camunda.CamundaModerationTaskResponse;
-import ru.itmo.blps1.dto.camunda.CompleteModerationTaskRequest;
-import ru.itmo.blps1.dto.camunda.CompleteModerationTaskResponse;
+import ru.itmo.blps1.dto.camunda.*;
 import ru.itmo.blps1.dto.file.FileUploadResponse;
 import ru.itmo.blps1.dto.moderation.SubmitBoardModerationResponse;
 import ru.itmo.blps1.dto.pin.PinResponse;
@@ -54,6 +60,8 @@ public class BusinessProcessService {
     private final BoardServiceInt boardService;
     private final TaskService taskService;
     private final MultipartFileStore multipartFileStore;
+    private final RepositoryService repositoryService;
+    private final FormService formService;
 
     public BoardResponse createBoard(CreateBoardRequest request) {
         Map<String, Object> variables = new HashMap<>();
@@ -327,6 +335,211 @@ public class BusinessProcessService {
         } finally {
             multipartFileStore.remove(fileRef);
         }
+    }
+
+    public CamundaStartFormResponse getStartForm(String processKey) {
+        ProcessDefinition processDefinition = getLatestProcessDefinition(processKey);
+
+        StartFormData formData = formService.getStartFormData(processDefinition.getId());
+
+        List<CamundaFormFieldResponse> fields = formData.getFormFields()
+                .stream()
+                .map(this::toFormFieldResponse)
+                .toList();
+
+        return new CamundaStartFormResponse(
+                processKey,
+                processDefinition.getId(),
+                formData.getFormKey(),
+                fields
+        );
+    }
+
+    public SubmitStartFormResponse submitStartForm(
+            String processKey,
+            SubmitStartFormRequest request
+    ) {
+        ProcessDefinition processDefinition = getLatestProcessDefinition(processKey);
+
+        StartFormData formData = formService.getStartFormData(processDefinition.getId());
+
+        Map<String, Object> convertedVariables = convertVariablesByFormFields(
+                formData.getFormFields(),
+                request.variables()
+        );
+
+        String businessKey = resolveBusinessKey(processKey, convertedVariables);
+
+        ProcessInstance processInstance;
+
+        if (businessKey == null) {
+            processInstance = formService.submitStartForm(
+                    processDefinition.getId(),
+                    convertedVariables
+            );
+        } else {
+            processInstance = formService.submitStartForm(
+                    processDefinition.getId(),
+                    businessKey,
+                    convertedVariables
+            );
+        }
+
+        return new SubmitStartFormResponse(
+                processKey,
+                processInstance.getProcessInstanceId(),
+                businessKey,
+                "Start form submitted"
+        );
+    }
+
+    public CamundaTaskFormResponse getModerationTaskForm(String taskId) {
+        Task task = taskService.createTaskQuery()
+                .taskId(taskId)
+                .taskDefinitionKey("UserTask_AdminDecision")
+                .singleResult();
+
+        if (task == null) {
+            throw new BadRequestException("Moderation task not found: " + taskId);
+        }
+
+        TaskFormData formData = formService.getTaskFormData(taskId);
+
+        List<CamundaFormFieldResponse> fields = formData.getFormFields()
+                .stream()
+                .map(this::toFormFieldResponse)
+                .toList();
+
+        return new CamundaTaskFormResponse(
+                taskId,
+                task.getName(),
+                formData.getFormKey(),
+                fields
+        );
+    }
+
+    public SubmitModerationTaskFormResponse submitModerationTaskForm(
+            String taskId,
+            SubmitModerationTaskFormRequest request
+    ) {
+        Task task = taskService.createTaskQuery()
+                .taskId(taskId)
+                .taskDefinitionKey("UserTask_AdminDecision")
+                .singleResult();
+
+        if (task == null) {
+            throw new BadRequestException("Moderation task not found: " + taskId);
+        }
+
+        if ("REJECTED".equals(request.moderationDecision())
+                && (request.moderatorComment() == null || request.moderatorComment().isBlank())) {
+            throw new BadRequestException("Comment is required for rejection");
+        }
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("moderationDecision", request.moderationDecision());
+        variables.put("moderatorComment", request.moderatorComment());
+
+        formService.submitTaskForm(taskId, variables);
+
+        return new SubmitModerationTaskFormResponse(
+                taskId,
+                request.moderationDecision(),
+                "Moderation task form submitted"
+        );
+    }
+
+    private ProcessDefinition getLatestProcessDefinition(String processKey) {
+        ProcessDefinition processDefinition = repositoryService
+                .createProcessDefinitionQuery()
+                .processDefinitionKey(processKey)
+                .latestVersion()
+                .singleResult();
+
+        if (processDefinition == null) {
+            throw new BadRequestException("Process definition not found: " + processKey);
+        }
+
+        return processDefinition;
+    }
+
+    private CamundaFormFieldResponse toFormFieldResponse(FormField field) {
+        Map<String, String> values = Collections.emptyMap();
+
+        if (field.getType() instanceof EnumFormType enumFormType) {
+            values = enumFormType.getValues();
+        }
+
+        return new CamundaFormFieldResponse(
+                field.getId(),
+                field.getLabel(),
+                field.getType() == null ? null : field.getType().getName(),
+                field.getDefaultValue(),
+                values
+        );
+    }
+
+    private Map<String, Object> convertVariablesByFormFields(
+            List<FormField> formFields,
+            Map<String, Object> rawVariables
+    ) {
+        Map<String, Object> converted = new LinkedHashMap<>();
+
+        for (FormField field : formFields) {
+            Object rawValue = rawVariables.get(field.getId());
+
+            if (rawValue == null) {
+                if (field.getDefaultValue() != null) {
+                    converted.put(field.getId(), field.getDefaultValue());
+                }
+                continue;
+            }
+
+            String typeName = field.getType() == null ? "string" : field.getType().getName();
+
+            converted.put(field.getId(), convertFormValue(typeName, rawValue));
+        }
+
+        return converted;
+    }
+
+    private Object convertFormValue(String typeName, Object rawValue) {
+        if (rawValue == null) {
+            return null;
+        }
+
+        return switch (typeName) {
+            case "long" -> toLong(rawValue);
+            case "boolean" -> toBoolean(rawValue);
+            default -> rawValue.toString();
+        };
+    }
+
+    private Boolean toBoolean(Object value) {
+        if (value instanceof Boolean booleanValue) {
+            return booleanValue;
+        }
+
+        return Boolean.valueOf(value.toString());
+    }
+
+    private String resolveBusinessKey(String processKey, Map<String, Object> variables) {
+        if ("board-moderation-process".equals(processKey)) {
+            Object boardId = variables.get("boardId");
+            return boardId == null ? null : "board-" + boardId;
+        }
+
+        if ("board-privacy-update-process".equals(processKey)) {
+            Object boardId = variables.get("boardId");
+            return boardId == null ? null : "board-" + boardId;
+        }
+
+        if ("board-create-process".equals(processKey)) {
+            Object ownerId = variables.get("ownerId");
+            return ownerId == null ? null : "owner-" + ownerId + "-board-create";
+        }
+
+        return null;
     }
 
     private Long toLong(Object value) {

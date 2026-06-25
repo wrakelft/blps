@@ -17,6 +17,14 @@
                   camunda:historyTimeToLive="30">
 
         <bpmn:startEvent id="StartEvent_SubmitModeration" name="Submit moderation">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="boardId"
+                                       label="Board ID"
+                                       type="long"/>
+                </camunda:formData>
+            </bpmn:extensionElements>
+
             <bpmn:outgoing>Flow_Start_To_Validate</bpmn:outgoing>
         </bpmn:startEvent>
 
@@ -65,6 +73,22 @@
         <bpmn:userTask id="UserTask_AdminDecision"
                        name="Admin moderation decision"
                        camunda:assignee="admin">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="moderationDecision"
+                                       label="Moderation decision"
+                                       type="enum"
+                                       defaultValue="APPROVED">
+                        <camunda:value id="APPROVED" name="Approve board"/>
+                        <camunda:value id="REJECTED" name="Reject board"/>
+                    </camunda:formField>
+
+                    <camunda:formField id="moderatorComment"
+                                       label="Reject reason"
+                                       type="string"/>
+                </camunda:formData>
+            </bpmn:extensionElements>
+
             <bpmn:incoming>Flow_CreateBitrixTask_To_AdminTask</bpmn:incoming>
             <bpmn:outgoing>Flow_AdminTask_To_Gateway</bpmn:outgoing>
         </bpmn:userTask>

@@ -1,10 +1,7 @@
 package ru.itmo.blps1.config;
 
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -70,6 +67,11 @@ public class CamundaEngineConfig {
     }
 
     @Bean
+    public FormService formService(ProcessEngine processEngine) {
+        return processEngine.getFormService();
+    }
+
+    @Bean
     public TaskService taskService(ProcessEngine processEngine) {
         return processEngine.getTaskService();
     }
@@ -91,7 +93,8 @@ public class CamundaEngineConfig {
 
             var deploymentBuilder = repositoryService
                     .createDeployment()
-                    .name("blps-camunda-processes");
+                    .name("blps-camunda-processes")
+                    .enableDuplicateFiltering(true);
 
             for (Resource resource : resources) {
                 try (InputStream inputStream = resource.getInputStream()) {

@@ -10,7 +10,31 @@
 
     <bpmn:process id="board-create-process" name="Board create process" isExecutable="true" camunda:historyTimeToLive="30">
 
-        <bpmn:startEvent id="StartEvent_CreateBoard" name="Board creation requested">
+        <bpmn:startEvent id="StartEvent_CreateBoard" name="Create board requested">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="boardName"
+                                       label="Board name"
+                                       type="string"/>
+
+                    <camunda:formField id="boardDescription"
+                                       label="Board description"
+                                       type="string"/>
+
+                    <camunda:formField id="boardPrivacy"
+                                       label="Board privacy"
+                                       type="enum"
+                                       defaultValue="PUBLIC">
+                        <camunda:value id="PUBLIC" name="Public"/>
+                        <camunda:value id="PRIVATE" name="Private"/>
+                    </camunda:formField>
+
+                    <camunda:formField id="ownerId"
+                                       label="Owner ID"
+                                       type="long"/>
+                </camunda:formData>
+            </bpmn:extensionElements>
+
             <bpmn:outgoing>Flow_Start_To_CreateBoard</bpmn:outgoing>
         </bpmn:startEvent>
 

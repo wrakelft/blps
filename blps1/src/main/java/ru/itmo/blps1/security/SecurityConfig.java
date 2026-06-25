@@ -64,6 +64,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/moderation/requests/*/approve").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/moderation/requests/*/reject").hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.GET, "/api/camunda/forms/start/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/camunda/forms/start/*/submit").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/camunda/forms/tasks/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/camunda/forms/tasks/*/submit").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/api/pins/with-file").hasAnyRole("USER", "ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/api/boards/*/pins/*").hasAnyRole("USER", "ADMIN")
